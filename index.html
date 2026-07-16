@@ -3,29 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#06120d" />
+  <meta name="theme-color" content="#0a0f0d" />
 
-  <title>Tahsin Tazwar — Co-Founder, Outsource to BD | Multiplying Bangladesh's Software Export</title>
-  <meta name="description" content="Tahsin Tazwar — Co-Founder of Outsource to BD. Building the trusted gateway between global technology leaders and Bangladesh's software talent. Vision: multiplying Bangladesh's software export." />
+  <title>Tahsin Tazwar — Venture Architect, Capital Advisor & Growth Strategist</title>
+  <meta name="description" content="Tahsin Tazwar — Venture Architect, Capital Advisor and Business Growth Strategist. Co-founder of OutsourceToBD.com and Entrepreneur in Residence at Brain Station 23, on a mission to multiply Bangladesh's software exports." />
   <meta name="author" content="Tahsin Tazwar" />
 
-  <!-- Open Graph / social preview -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Tahsin Tazwar — Co-Founder, Outsource to BD" />
-  <meta property="og:description" content="Building the trusted gateway between global technology leaders and Bangladesh's software talent. Vision: multiplying Bangladesh's software export." />
-  <meta property="og:site_name" content="Tahsin Tazwar" />
+  <meta property="og:type" content="profile" />
+  <meta property="og:title" content="Tahsin Tazwar — Venture Architect & Capital Advisor" />
+  <meta property="og:description" content="Building ventures that create measurable economic impact. Co-founder, OutsourceToBD.com. EIR, Brain Station 23." />
+  <meta property="og:image" content="assets/tahsin.png" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23064e3b'/%3E%3Ctext x='50' y='68' font-family='Space Grotesk,Arial' font-size='54' font-weight='700' text-anchor='middle' fill='%2334d399'%3ETT%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230b6e4f'/%3E%3Ctext x='50' y='68' font-family='Space Grotesk,Arial' font-size='52' font-weight='700' text-anchor='middle' fill='%2340e0a0'%3ETT%3C/text%3E%3C/svg%3E" />
 
+  <script>
+    /* Set theme before first paint to avoid flash of wrong theme */
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (t !== 'light' && t !== 'dark') {
+          t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body>
-  <!-- Ambient background -->
   <div class="bg-orbs" aria-hidden="true">
     <span class="orb orb-1"></span>
     <span class="orb orb-2"></span>
@@ -41,13 +53,17 @@
       </a>
 
       <nav class="nav-links" id="navLinks" aria-label="Primary">
-        <a href="#vision">Vision</a>
-        <a href="#opportunity">Opportunity</a>
-        <a href="#platform">Platform</a>
-        <a href="#model">Model</a>
         <a href="#about">About</a>
-        <a href="#connect" class="nav-cta">Partner with us</a>
+        <a href="#mission">Mission</a>
+        <a href="#expertise">Expertise</a>
+        <a href="#beyond">Beyond</a>
+        <a href="#book" class="nav-cta">Book a Call</a>
       </nav>
+
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch between light and dark mode" title="Toggle light / dark">
+        <svg class="ic ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+        <svg class="ic ic-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8z"/></svg>
+      </button>
 
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -58,247 +74,177 @@
   <main>
     <!-- ===================== HERO ===================== -->
     <section class="hero">
-      <div class="container hero-inner">
-        <p class="eyebrow reveal">
-          <span class="dot"></span> Co-Founder · Outsource to BD · Dhaka, Bangladesh
-        </p>
-
-        <h1 class="hero-title reveal">
-          Multiplying Bangladesh's
-          <span class="grad">software export.</span>
-        </h1>
-
-        <p class="hero-lead reveal">
-          I'm <strong>Tahsin Tazwar</strong>, Co-Founder of <strong>Outsource to BD</strong> — the trusted
-          gateway connecting global technology leaders with verified engineering talent from Bangladesh.
-          We turn one of the world's largest untapped talent pools into dependable, milestone-driven delivery.
-        </p>
-
-        <div class="hero-actions reveal">
-          <a href="#connect" class="btn btn-primary">Build with Bangladesh &nbsp;→</a>
-          <a href="https://www.linkedin.com/in/tahsin-tazwar" target="_blank" rel="noopener" class="btn btn-ghost">
-            Connect on LinkedIn
-          </a>
-        </div>
-
-        <!-- NOTE: Edit these headline metrics in index.html to your real, verified numbers. -->
-        <dl class="hero-stats reveal">
-          <div class="stat">
-            <dt class="stat-num" data-count="650000">0</dt>
-            <dd>IT professionals in Bangladesh's talent pool*</dd>
-          </div>
-          <div class="stat">
-            <dt class="stat-num" data-count="60" data-suffix="%">0</dt>
-            <dd>Typical cost advantage vs. Western rates*</dd>
-          </div>
-          <div class="stat">
-            <dt class="stat-num" data-count="100" data-suffix="%">0</dt>
-            <dd>Vetted, milestone-accountable partners</dd>
-          </div>
-        </dl>
-        <p class="stat-footnote reveal">*Industry figures — replace with your verified, sourced numbers before launch.</p>
-      </div>
-    </section>
-
-    <!-- ===================== VISION ===================== -->
-    <section class="section" id="vision">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="kicker">The Mandate</span>
-          <h2>A national opportunity, delivered to a global standard.</h2>
-        </div>
-
-        <div class="vision-grid">
-          <div class="vision-lead reveal">
-            <p>
-              Bangladesh has the engineers, the ambition, and the momentum. What the world has lacked is a
-              <strong>trusted, accountable way to access it</strong> — a bridge where quality is verified, delivery
-              is guaranteed, and scale is a feature rather than a risk.
-            </p>
-            <p>
-              That bridge is what we're building. My mission is simple and large: <strong>multiply the value of
-              Bangladesh's software export</strong> by making it the obvious, low-risk choice for serious
-              technology leaders everywhere.
-            </p>
-          </div>
-
-          <blockquote class="vision-quote reveal">
-            <p>“Talent is evenly distributed. Opportunity is not. We exist to close that gap — at scale.”</p>
-            <footer>— Tahsin Tazwar</footer>
-          </blockquote>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== OPPORTUNITY ===================== -->
-    <section class="section section-alt" id="opportunity">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="kicker">Why Bangladesh</span>
-          <h2>The world's next major software delivery hub.</h2>
-          <p class="section-sub">
-            Not a cost play — a capability play. Here's why forward-looking CTOs are moving now.
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow reveal">
+            <span class="dot"></span> Dhaka, Bangladesh · Working globally
           </p>
-        </div>
 
-        <div class="cards">
-          <article class="card reveal">
-            <div class="card-icon">👥</div>
-            <h3>Deep, young talent pool</h3>
-            <p>A vast and rapidly growing base of software engineers, with tens of thousands graduating every year — hungry, capable, and English-proficient.</p>
-          </article>
-          <article class="card reveal">
-            <div class="card-icon">📈</div>
-            <h3>Proven export momentum</h3>
-            <p>Bangladesh's ICT sector is a national priority with sustained export growth — an ecosystem being built, not discovered.</p>
-          </article>
-          <article class="card reveal">
-            <div class="card-icon">⚖️</div>
-            <h3>Exceptional value</h3>
-            <p>World-class engineering economics without the compromise — freeing budget to move faster on the work that actually differentiates you.</p>
-          </article>
-          <article class="card reveal">
-            <div class="card-icon">🕒</div>
-            <h3>Timezone that works</h3>
-            <p>A working day that overlaps both Europe and Asia, enabling genuine collaboration and near-round-the-clock delivery cycles.</p>
-          </article>
-        </div>
-      </div>
-    </section>
+          <h1 class="hero-title reveal">
+            Tahsin&nbsp;Tazwar
+          </h1>
 
-    <!-- ===================== PLATFORM ===================== -->
-    <section class="section" id="platform">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="kicker">Outsource to BD</span>
-          <h2>Your trusted gateway to Bangladeshi tech talent.</h2>
-          <p class="section-sub">
-            A quality-assured platform that removes the two things that stop global buyers: trust and reliability.
+          <p class="hero-roles reveal">
+            Venture Architect <span>·</span> Capital Advisor <span>·</span> Business Growth Strategist
           </p>
+
+          <p class="hero-lead reveal">
+            I build businesses that create <strong>measurable economic impact</strong> — helping founders
+            scale, enabling companies to enter new markets, and building bridges between Bangladesh and
+            global innovation ecosystems.
+          </p>
+
+          <div class="hero-actions reveal">
+            <a href="#book" class="btn btn-primary">Book a Meeting &nbsp;→</a>
+            <a href="https://www.linkedin.com/in/tahsin-tazwar" target="_blank" rel="noopener" class="btn btn-ghost">
+              Connect on LinkedIn
+            </a>
+          </div>
+
+          <ul class="hero-tags reveal">
+            <li>Co-founder, <strong>OutsourceToBD.com</strong></li>
+            <li>EIR, <strong>Brain Station 23</strong></li>
+          </ul>
         </div>
 
-        <div class="pillars">
-          <article class="pillar reveal">
-            <span class="pillar-no">01</span>
-            <h3>Verified company directory</h3>
-            <p>Every partner is vetted and listed — a curated network of accountable firms, not an anonymous marketplace. You always know exactly who you're working with.</p>
-          </article>
-          <article class="pillar reveal">
-            <span class="pillar-no">02</span>
-            <h3>Project assurance</h3>
-            <p>Milestone-based delivery with built-in accountability. Scope, checkpoints, and outcomes are structured up front so quality is a process, not a hope.</p>
-          </article>
-          <article class="pillar reveal">
-            <span class="pillar-no">03</span>
-            <h3>Unified delivery network</h3>
-            <p>Coordinate multiple specialist companies under one delivery framework — so large, cross-discipline projects ship as one team, not five vendors.</p>
-          </article>
-          <article class="pillar reveal">
-            <span class="pillar-no">04</span>
-            <h3>Bench &amp; dedicated resourcing</h3>
-            <p>Scale up dedicated engineers or place bench talent on demand — flexible capacity that expands and contracts with your roadmap.</p>
-          </article>
+        <div class="hero-photo-wrap reveal">
+          <img class="hero-photo" src="assets/tahsin.png" alt="Portrait of Tahsin Tazwar" width="440" height="440" />
         </div>
-      </div>
-    </section>
-
-    <!-- ===================== MODEL ===================== -->
-    <section class="section section-alt" id="model">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="kicker">How it works</span>
-          <h2>From first conversation to shipped software.</h2>
-        </div>
-
-        <ol class="steps">
-          <li class="step reveal">
-            <span class="step-no">1</span>
-            <div>
-              <h3>Tell us the outcome</h3>
-              <p>Share the problem, stack, and timeline. We translate it into a clear, milestone-based delivery plan.</p>
-            </div>
-          </li>
-          <li class="step reveal">
-            <span class="step-no">2</span>
-            <div>
-              <h3>Matched to verified partners</h3>
-              <p>We pair you with the right vetted company — or coordinated set of companies — for the job.</p>
-            </div>
-          </li>
-          <li class="step reveal">
-            <span class="step-no">3</span>
-            <div>
-              <h3>Delivery, assured</h3>
-              <p>Work ships against defined milestones with accountability and transparency at every checkpoint.</p>
-            </div>
-          </li>
-          <li class="step reveal">
-            <span class="step-no">4</span>
-            <div>
-              <h3>Scale with confidence</h3>
-              <p>Expand the engagement, add teams, or spin up new projects — on infrastructure you already trust.</p>
-            </div>
-          </li>
-        </ol>
       </div>
     </section>
 
     <!-- ===================== ABOUT ===================== -->
     <section class="section" id="about">
-      <div class="container about-grid">
-        <div class="about-photo reveal">
-          <!-- Replace the placeholder below with your photo: put it at assets/tahsin.jpg
-               and swap the <div class="photo-ph"> for: <img src="assets/tahsin.jpg" alt="Tahsin Tazwar" /> -->
-          <div class="photo-ph" role="img" aria-label="Portrait of Tahsin Tazwar (add your photo)">
-            <span>TT</span>
-            <small>Add your photo → assets/tahsin.jpg</small>
-          </div>
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker">About</span>
+          <h2>At the intersection of entrepreneurship, technology &amp; investment.</h2>
         </div>
 
-        <div class="about-body reveal">
-          <span class="kicker">About</span>
-          <h2>Tahsin Tazwar</h2>
-          <p class="about-role">Co-Founder, Outsource to BD · Dhaka, Bangladesh</p>
-          <!-- EDIT this bio to your own voice. -->
-          <p>
-            I'm a builder focused on a single, outsized opportunity: turning Bangladesh into a global-default
-            destination for software delivery. At Outsource to BD, I lead the work of making that access
-            <em>trustworthy</em> — verifying partners, structuring accountable delivery, and giving international
-            teams a frictionless way to build with Bangladeshi talent.
-          </p>
-          <p>
-            I care about the compounding kind of impact: every dependable engagement raises the ceiling for the
-            next founder, the next engineer, and the country's export story as a whole.
-          </p>
+        <div class="about-grid">
+          <div class="about-body reveal">
+            <p>
+              I'm a venture architect and capital advisor focused on building businesses that create
+              measurable economic impact. As <strong>Co-founder of OutsourceToBD.com</strong>, I'm on a
+              mission to multiply Bangladesh's software and technology exports by connecting global buyers
+              with trusted Bangladeshi technology companies — building the country's trusted gateway for
+              software outsourcing and positioning Bangladesh as a leading global technology destination.
+            </p>
+            <p>
+              Alongside this, I serve as <strong>Entrepreneur in Residence (EIR) at Brain Station 23</strong>,
+              working on venture creation, strategic partnerships, innovation initiatives, and ecosystem
+              development with one of Bangladesh's leading software companies.
+            </p>
+            <p>
+              Over the past decade, I've worked with startups, SMEs, multinationals, and investors across
+              business strategy, venture building, go-to-market execution, capital advisory, product strategy,
+              and international market expansion — helping founders build scalable companies and creating
+              bridges between Bangladesh and global innovation ecosystems.
+            </p>
+          </div>
 
-          <ul class="about-facts">
-            <li><strong>Building</strong> the trusted gateway for BD software export</li>
-            <li><strong>Focus</strong> — verified partners, milestone delivery, global trust</li>
-            <li><strong>Based in</strong> Dhaka, working with teams worldwide</li>
-          </ul>
-
-          <div class="about-actions">
-            <a href="https://www.linkedin.com/in/tahsin-tazwar" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">LinkedIn ↗</a>
-            <a href="https://outsourcetobd.com" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">outsourcetobd.com ↗</a>
+          <div class="roles reveal">
+            <article class="role-card">
+              <span class="role-label">Co-founder</span>
+              <h3>OutsourceToBD.com</h3>
+              <p>Bangladesh's trusted gateway connecting global buyers with verified Bangladeshi tech companies.</p>
+              <a href="https://outsourcetobd.com" target="_blank" rel="noopener">outsourcetobd.com ↗</a>
+            </article>
+            <article class="role-card">
+              <span class="role-label">Entrepreneur in Residence</span>
+              <h3>Brain Station 23</h3>
+              <p>Venture creation, strategic partnerships, and ecosystem development with a leading software company.</p>
+            </article>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ===================== CONNECT / CTA ===================== -->
-    <section class="section cta" id="connect">
-      <div class="container cta-inner reveal">
-        <span class="kicker">Let's talk</span>
-        <h2>Ready to build with Bangladesh?</h2>
-        <p>
-          Whether you're scaling an engineering team, shipping a product, or exploring a delivery partner —
-          let's start a conversation. I'll personally make sure you're matched to the right, verified team.
-        </p>
-        <div class="cta-actions">
-          <a href="mailto:contact@outsourcetobd.com?subject=Building%20with%20Outsource%20to%20BD" class="btn btn-primary">Email me directly</a>
-          <a href="https://www.linkedin.com/in/tahsin-tazwar" target="_blank" rel="noopener" class="btn btn-ghost">Message on LinkedIn</a>
+    <!-- ===================== MISSION / WHAT DRIVES ME ===================== -->
+    <section class="section section-alt" id="mission">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker">What drives me</span>
+          <h2>Bangladesh can be one of the world's most respected tech hubs.</h2>
         </div>
-        <p class="cta-meta">contact@outsourcetobd.com &nbsp;·&nbsp; +880 1712-123123 &nbsp;·&nbsp; Dhaka, Bangladesh</p>
+
+        <div class="mission-grid">
+          <p class="mission-lead reveal">
+            I believe Bangladesh has the talent, capability, and entrepreneurial mindset to become one of the
+            world's most respected software and technology hubs. Everything I build is in service of that belief.
+          </p>
+          <blockquote class="mission-quote reveal">
+            <p>
+              Multiply Bangladesh's software exports, empower local technology companies, and create global
+              opportunities through <span class="hl">innovation, trust, and strategic collaboration.</span>
+            </p>
+            <footer>— My mission</footer>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== EXPERTISE ===================== -->
+    <section class="section" id="expertise">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker">Areas of expertise</span>
+          <h2>Where I create the most leverage.</h2>
+        </div>
+
+        <ul class="chips reveal">
+          <li>Venture Building</li>
+          <li>Capital Advisory</li>
+          <li>Business Strategy</li>
+          <li>Go-to-Market Strategy</li>
+          <li>B2B Growth</li>
+          <li>Strategic Partnerships</li>
+          <li>Product Strategy</li>
+          <li>International Market Expansion</li>
+          <li>Startup Advisory</li>
+          <li>Innovation &amp; Ecosystem Development</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== BEYOND BUSINESS ===================== -->
+    <section class="section section-alt" id="beyond">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="kicker">Beyond business</span>
+          <h2>Strengthening the ecosystem.</h2>
+        </div>
+        <p class="beyond-text reveal">
+          I'm passionate about strengthening Bangladesh's innovation ecosystem by connecting founders,
+          investors, enterprises, policymakers, and global partners. Whether it's scaling startups,
+          facilitating strategic collaborations, or opening new international opportunities, my focus
+          remains the same: <strong>building ventures that create lasting impact.</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== BOOK A CALL ===================== -->
+    <section class="section book" id="book">
+      <div class="container book-inner reveal">
+        <span class="kicker">Let's talk</span>
+        <h2>Book a call with me.</h2>
+        <p>
+          Building a venture, entering a new market, or exploring a partnership between Bangladesh and the
+          world? Grab a 30-minute Google Meet — pick a time that works and I'll see you there.
+        </p>
+
+        <div class="book-actions">
+          <!-- Replace the href below with your Google Calendar "Appointment schedule" booking link once created.
+               For now this opens a pre-filled Google Meet invite that adds Tahsin as a guest. -->
+          <a class="btn btn-primary"
+             href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Intro%20call%20with%20Tahsin%20Tazwar&add=tahsin.apac@gmail.com&details=30-minute%20introduction%20call%20over%20Google%20Meet."
+             target="_blank" rel="noopener">
+            📅 &nbsp;Schedule a Google Meet
+          </a>
+          <a class="btn btn-ghost" href="mailto:tahsin.apac@gmail.com?subject=Let's%20connect">Email me</a>
+        </div>
+
+        <p class="book-meta">tahsin.apac@gmail.com &nbsp;·&nbsp; Dhaka, Bangladesh</p>
       </div>
     </section>
   </main>
@@ -310,17 +256,17 @@
         <span class="brand-mark">TT</span>
         <div>
           <strong>Tahsin Tazwar</strong>
-          <span>Co-Founder, Outsource to BD</span>
+          <span>Venture Architect · Capital Advisor</span>
         </div>
       </div>
       <nav class="footer-links" aria-label="Footer">
-        <a href="#vision">Vision</a>
-        <a href="#platform">Platform</a>
         <a href="#about">About</a>
-        <a href="#connect">Contact</a>
-        <a href="https://outsourcetobd.com" target="_blank" rel="noopener">outsourcetobd.com ↗</a>
+        <a href="#mission">Mission</a>
+        <a href="#expertise">Expertise</a>
+        <a href="#book">Book a Call</a>
+        <a href="https://www.linkedin.com/in/tahsin-tazwar" target="_blank" rel="noopener">LinkedIn ↗</a>
       </nav>
-      <p class="footer-copy">© <span id="year">2026</span> Tahsin Tazwar · Multiplying Bangladesh's software export.</p>
+      <p class="footer-copy">© <span id="year">2026</span> Tahsin Tazwar · Building ventures that create lasting impact.</p>
     </div>
   </footer>
 
