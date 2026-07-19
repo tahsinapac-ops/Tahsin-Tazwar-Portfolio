@@ -142,7 +142,7 @@ body::before { content:""; position:fixed; inset:0; z-index:-1;
 
 /* Stat band */
 .stats { padding:6px 0; }
-.stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
+.stats-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px;
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px 20px; box-shadow:var(--shadow); }
 .stat { text-align:center; }
 .stat-num { display:block; font-family:var(--font-head); font-size:clamp(2rem,5vw,2.8rem); font-weight:700; letter-spacing:-0.03em; color:var(--green); }
