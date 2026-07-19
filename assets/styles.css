@@ -116,8 +116,6 @@ body::before { content:""; position:fixed; inset:0; z-index:-1;
 .globe-viz:active { cursor:grabbing; }
 .globe-viz canvas { display:block; outline:none; }
 .globe-viz.globe-failed { display:none; }
-.globe-hint { text-align:center; color:var(--faint); font-size:12.5px; margin-top:4px; }
-.globe-cap { text-align:center; max-width:560px; margin:22px auto 0; color:var(--muted); font-size:0.98rem; }
 
 .hero-grid { position:relative; z-index:1; display:grid; grid-template-columns:1.1fr 0.9fr; gap:52px; align-items:center; }
 .eyebrow { display:inline-flex; align-items:center; gap:10px; font-size:12.5px; font-weight:500;
@@ -262,7 +260,7 @@ body::before { content:""; position:fixed; inset:0; z-index:-1;
 
 @media (max-width:560px) {
   .container { padding:0 16px; }
-  .brand-text { display:none; }
+  .brand-text { font-size:16.5px; }
   .hero { padding-top:22px; }
   .hero-actions .btn, .book-actions .btn { flex:1 1 auto; }
   .stats-grid { grid-template-columns:1fr; gap:20px; padding:24px 18px; }
