@@ -169,7 +169,7 @@ body::before { content:""; position:fixed; inset:0; z-index:-1;
 .do-card p { color:var(--muted); font-size:0.95rem; }
 
 /* About */
-.about-grid { display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; }
+.about-grid { display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:start; }
 .about-copy { max-width:520px; }
 /* Heading shares the same left rail + width as the copy column below it */
 #about .section-head { max-width:520px; margin-bottom:34px; }
