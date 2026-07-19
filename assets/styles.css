@@ -171,8 +171,8 @@ body::before { content:""; position:fixed; inset:0; z-index:-1;
 /* About */
 .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:start; }
 .about-copy { max-width:520px; }
-/* Heading shares the same left rail + width as the copy column below it */
-#about .section-head { max-width:520px; margin-bottom:34px; }
+/* Heading lives inside the left column so both sides share one top edge */
+.about-copy h2 { font-size:clamp(1.7rem,4.6vw,2.6rem); margin-bottom:22px; }
 .about-lead { font-family:var(--font-head); font-weight:400; font-size:clamp(1.18rem,2.6vw,1.5rem);
   line-height:1.35; letter-spacing:-0.01em; color:var(--text); margin-bottom:18px; }
 .about-text { color:var(--muted); font-size:1.05rem; }
