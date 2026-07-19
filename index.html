@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
 
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230b6e4f'/%3E%3Ctext x='50' y='68' font-family='Space Grotesk,Arial' font-size='52' font-weight='700' text-anchor='middle' fill='%2340e0a0'%3ETT%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230b6e4f'/%3E%3Ctext x='50' y='68' font-family='Nunito,Arial' font-size='52' font-weight='900' text-anchor='middle' fill='%2340e0a0'%3ETT%3C/text%3E%3C/svg%3E" />
 
   <script>
     (function () {
@@ -82,7 +82,7 @@
       </div>
     </section>
 
-    <!-- ===================== REACH / GLOBE ===================== -->
+    <!-- ===================== REACH / INTERACTIVE GLOBE ===================== -->
     <section class="section globe-section" id="reach">
       <div class="container">
         <div class="section-head center reveal">
@@ -91,98 +91,10 @@
         </div>
 
         <div class="globe-stage reveal">
-          <svg viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Globe showing Bangladesh connected to the world">
-            <defs>
-              <radialGradient id="ocean" cx="38%" cy="34%" r="72%">
-                <stop offset="0%" stop-color="#17505a"/><stop offset="52%" stop-color="#0c3038"/><stop offset="100%" stop-color="#05161b"/>
-              </radialGradient>
-              <radialGradient id="atmo" cx="50%" cy="50%" r="50%">
-                <stop offset="60%" stop-color="#2ee6a6" stop-opacity="0"/><stop offset="86%" stop-color="#2ee6a6" stop-opacity="0.16"/><stop offset="100%" stop-color="#2ee6a6" stop-opacity="0"/>
-              </radialGradient>
-              <radialGradient id="shade" cx="40%" cy="36%" r="70%">
-                <stop offset="55%" stop-color="#000000" stop-opacity="0"/><stop offset="100%" stop-color="#00110d" stop-opacity="0.55"/>
-              </radialGradient>
-              <radialGradient id="spec" cx="32%" cy="28%" r="26%">
-                <stop offset="0%" stop-color="#bfeee0" stop-opacity="0.35"/><stop offset="100%" stop-color="#bfeee0" stop-opacity="0"/>
-              </radialGradient>
-              <linearGradient id="land" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#18a074"/><stop offset="100%" stop-color="#0c6647"/>
-              </linearGradient>
-              <radialGradient id="bdpulse" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#ff8a2b" stop-opacity="0.85"/><stop offset="100%" stop-color="#ff8a2b" stop-opacity="0"/>
-              </radialGradient>
-              <filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"/></filter>
-              <filter id="dot" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-              <clipPath id="ball"><circle cx="340" cy="300" r="250"/></clipPath>
-            </defs>
-
-            <!-- atmosphere -->
-            <circle cx="340" cy="300" r="286" fill="url(#atmo)"/>
-            <!-- ocean sphere -->
-            <circle cx="340" cy="300" r="250" fill="url(#ocean)"/>
-
-            <g clip-path="url(#ball)">
-              <!-- graticule -->
-              <g fill="none" stroke="#9fe8d0" stroke-opacity="0.1" stroke-width="1">
-                <ellipse cx="340" cy="300" rx="250" ry="86"/><ellipse cx="340" cy="300" rx="250" ry="166"/>
-                <ellipse cx="340" cy="300" rx="86" ry="250"/><ellipse cx="340" cy="300" rx="166" ry="250"/>
-                <line x1="90" y1="300" x2="590" y2="300"/><line x1="340" y1="50" x2="340" y2="550"/>
-              </g>
-
-              <!-- landmasses (stylized, South-Asia face) -->
-              <g fill="url(#land)" fill-opacity="0.92">
-                <!-- India subcontinent -->
-                <path d="M262 214 Q300 200 342 208 Q372 214 388 232 L382 250 Q398 246 410 236 L426 250
-                         Q404 270 396 292 L378 300 Q372 330 356 360 Q340 396 322 430 Q314 452 306 452
-                         Q300 430 296 402 Q286 378 276 360 Q262 336 256 306 Q250 276 254 250 Q256 228 262 214 Z"/>
-                <!-- Sri Lanka -->
-                <ellipse cx="322" cy="470" rx="12" ry="18"/>
-                <!-- SE Asia hint (Myanmar / Indochina) -->
-                <path d="M410 250 Q440 260 452 292 Q462 322 448 356 Q440 330 428 314 Q416 296 410 276 Z"/>
-                <!-- Arabia / West edge hint -->
-                <path d="M150 250 Q188 244 214 262 Q206 292 214 320 Q188 316 168 300 Q150 282 150 250 Z" fill-opacity="0.75"/>
-                <!-- NE Africa edge hint -->
-                <path d="M132 322 Q156 330 168 356 Q176 388 162 416 Q150 392 140 372 Q128 350 132 322 Z" fill-opacity="0.6"/>
-                <!-- China / North hint -->
-                <path d="M400 176 Q450 168 486 190 Q456 206 424 208 Q404 200 400 176 Z" fill-opacity="0.7"/>
-              </g>
-
-              <!-- limb darkening + specular for 3D -->
-              <circle cx="340" cy="300" r="250" fill="url(#shade)"/>
-              <circle cx="340" cy="300" r="250" fill="url(#spec)"/>
-            </g>
-
-            <!-- rim light -->
-            <circle cx="340" cy="300" r="250" fill="none" stroke="#3ff0b2" stroke-opacity="0.28" stroke-width="1.5"/>
-
-            <!-- connection arcs from Bangladesh -->
-            <g fill="none" stroke="#ff8a2b" stroke-width="1.4" stroke-opacity="0.32">
-              <path id="r1" d="M392 286 Q250 150 118 176"/>
-              <path id="r2" d="M392 286 Q470 120 360 70"/>
-              <path id="r3" d="M392 286 Q560 190 606 296"/>
-              <path id="r4" d="M392 286 Q520 380 556 470"/>
-              <path id="r5" d="M392 286 Q230 400 150 486"/>
-            </g>
-            <g fill="#ff8a2b" filter="url(#dot)">
-              <circle r="3.4"><animateMotion dur="3.4s" repeatCount="indefinite"><mpath xlink:href="#r1"/></animateMotion></circle>
-              <circle r="3.4"><animateMotion dur="4s" begin="0.6s" repeatCount="indefinite"><mpath xlink:href="#r2"/></animateMotion></circle>
-              <circle r="3.4"><animateMotion dur="3.7s" begin="1.1s" repeatCount="indefinite"><mpath xlink:href="#r3"/></animateMotion></circle>
-              <circle r="3.4"><animateMotion dur="4.2s" begin="0.3s" repeatCount="indefinite"><mpath xlink:href="#r4"/></animateMotion></circle>
-              <circle r="3.4"><animateMotion dur="3.6s" begin="1.5s" repeatCount="indefinite"><mpath xlink:href="#r5"/></animateMotion></circle>
-            </g>
-
-            <!-- Bangladesh: pulse + pin + flag + label -->
-            <circle cx="392" cy="286" r="26" fill="url(#bdpulse)"><animate attributeName="r" values="16;30;16" dur="2.6s" repeatCount="indefinite"/></circle>
-            <path d="M392 268 c-9 0 -16 7 -16 16 c0 12 16 26 16 26 c0 0 16 -14 16 -26 c0 -9 -7 -16 -16 -16 Z" fill="#ff8a2b" filter="url(#soft)"/>
-            <circle cx="392" cy="284" r="6" fill="#fff"/>
-            <line x1="392" y1="268" x2="446" y2="214" stroke="#ff8a2b" stroke-width="1.4" stroke-opacity="0.7"/>
-            <g transform="translate(446,196)">
-              <rect x="0" y="0" width="34" height="22" rx="3" fill="#006a4e"/>
-              <circle cx="15" cy="11" r="6" fill="#f42a41"/>
-              <text x="42" y="16" font-family="Space Grotesk,Arial" font-weight="700" font-size="16" fill="#eaf3ee">Bangladesh</text>
-            </g>
-          </svg>
+          <div id="globeViz" class="globe-viz" role="img" aria-label="Interactive 3D globe showing Bangladesh connected to cities worldwide"></div>
+          <p class="globe-hint">Drag to spin the globe 🌍</p>
         </div>
+
         <p class="globe-cap reveal">Verified companies · ecosystem partnerships · structured discovery — a trusted bridge to Bangladesh's digital economy.</p>
       </div>
     </section>
@@ -307,5 +219,7 @@
   <a href="https://calendly.com/tahsin-raiseos" target="_blank" rel="noopener" class="fab" aria-label="Book a call">Book a Call</a>
 
   <script src="assets/script.js" defer></script>
+  <script src="https://unpkg.com/globe.gl" defer></script>
+  <script src="assets/globe.js" defer></script>
 </body>
 </html>
