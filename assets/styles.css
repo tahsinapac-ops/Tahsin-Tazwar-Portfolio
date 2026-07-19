@@ -16,6 +16,7 @@
   --header-bg:rgba(10,15,13,0.65); --header-bg-solid:rgba(10,15,13,0.88); --menu-bg:rgba(10,15,13,0.97);
   --font-head:"Space Grotesk","Segoe UI",system-ui,sans-serif;
   --font-body:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-logo:"Nunito","Segoe UI",system-ui,sans-serif;
 }
 
 :root[data-theme="light"] {
@@ -58,10 +59,11 @@ body::before { content:""; position:fixed; inset:0; z-index:-1;
   border-bottom:1px solid transparent; transition:border-color .3s, background .3s; }
 .nav.scrolled { border-bottom-color:var(--border); background:var(--header-bg-solid); }
 .nav-inner { display:flex; align-items:center; gap:12px; height:70px; }
-.brand { display:flex; align-items:center; gap:12px; font-weight:600; margin-right:auto; }
+.brand { display:flex; align-items:center; gap:11px; font-weight:600; margin-right:auto; }
 .brand-mark { display:grid; place-items:center; width:38px; height:38px; border-radius:9px;
-  font-family:var(--font-head); font-weight:700; font-size:15px; color:#06120d; background:var(--green); }
-.brand-text { font-family:var(--font-head); font-size:16px; letter-spacing:-0.01em; }
+  font-family:var(--font-logo); font-weight:900; font-size:15px; letter-spacing:-0.5px; color:#06120d; background:var(--green); }
+.brand-text { font-family:var(--font-logo); font-size:18px; font-weight:700; letter-spacing:-0.02em; color:var(--text); }
+.brand-text b { font-weight:900; color:var(--green); }
 .nav-links { display:flex; align-items:center; gap:26px; }
 .nav-links a { color:var(--muted); font-size:14.5px; font-weight:500; transition:color .2s; }
 .nav-links a:hover, .nav-links a.active { color:var(--text); }
