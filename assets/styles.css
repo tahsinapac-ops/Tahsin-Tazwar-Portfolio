@@ -297,11 +297,15 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   .about-grid { grid-template-columns:1fr; gap:26px; }
 }
 
-@media (max-width:380px) {
-  .dock { padding:10px 6px; }
-  .dock-item { font-size:9px; }
-  .dock-center { width:54px; height:54px; margin:-27px 5px 0; }
-  .dock-center span { font-size:23px; }
+/* Phones: icon-only dock so it can never overflow the screen */
+@media (max-width:520px) {
+  .dock { width:calc(100% - 20px); padding:12px 8px; gap:0; }
+  .dock-item span { display:none; }
+  .dock-item { padding:2px 0; }
+  .dock-item svg { width:23px; height:23px; }
+  .dock-center { width:56px; height:56px; margin:-28px 6px 0; }
+  .dock-center span { display:block; font-size:24px; }
+  .dock-menu { min-width:200px; right:2px; }
 }
 
 @media (max-width:560px) {
