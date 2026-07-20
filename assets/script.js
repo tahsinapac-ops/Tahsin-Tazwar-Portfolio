@@ -109,6 +109,31 @@
     sections.forEach(function (s) { spy.observe(s); });
   }
 
+  /* ---- Dock overflow menu ---- */
+  var menuBtn = document.getElementById("dockMenuBtn");
+  var dockMenu = document.getElementById("dockMenu");
+  if (menuBtn && dockMenu) {
+    var setMenu = function (open) {
+      dockMenu.classList.toggle("open", open);
+      menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+    menuBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      setMenu(!dockMenu.classList.contains("open"));
+    });
+    // Close after choosing a destination (but not when toggling the theme)
+    dockMenu.querySelectorAll("a").forEach(function (a) {
+      a.addEventListener("click", function () { setMenu(false); });
+    });
+    // Close on outside click or Escape
+    document.addEventListener("click", function (e) {
+      if (!dockMenu.contains(e.target) && e.target !== menuBtn) setMenu(false);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") setMenu(false);
+    });
+  }
+
   /* ---- Light / dark theme toggle ---- */
   var themeBtn = document.getElementById("themeToggle");
   if (themeBtn) {
