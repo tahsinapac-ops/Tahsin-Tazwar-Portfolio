@@ -118,7 +118,7 @@
       document.documentElement.setAttribute("data-theme", next);
       // Keep the mobile browser address-bar colour in sync with the theme
       var meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute("content", next === "light" ? "#f5f8f6" : "#0a0f0d");
+      if (meta) meta.setAttribute("content", next === "light" ? "#faf8ff" : "#0d0720");
       try { localStorage.setItem("theme", next); } catch (e) {}
     });
   }

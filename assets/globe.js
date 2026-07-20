@@ -42,7 +42,7 @@
     .bumpImageUrl(CDN + "earth-topology.png")
     .backgroundColor("rgba(0,0,0,0)")
     .showAtmosphere(true)
-    .atmosphereColor("#3ff0b2")
+    .atmosphereColor("#a855f7")
     .atmosphereAltitude(0.17)
 
     // Bangladesh marker
@@ -68,7 +68,7 @@
 
     // Connections out to the world
     .arcsData(arcs)
-    .arcColor(function () { return ["rgba(255,138,43,0.9)", "rgba(63,240,178,0.6)"]; })
+    .arcColor(function () { return ["rgba(255,138,43,0.95)", "rgba(168,85,247,0.75)"]; })
     .arcAltitudeAutoScale(0.45)
     .arcStroke(0.45)
     .arcDashLength(0.38)
