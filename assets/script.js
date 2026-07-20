@@ -116,6 +116,9 @@
       var cur = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
       var next = cur === "light" ? "dark" : "light";
       document.documentElement.setAttribute("data-theme", next);
+      // Keep the mobile browser address-bar colour in sync with the theme
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", next === "light" ? "#f5f8f6" : "#0a0f0d");
       try { localStorage.setItem("theme", next); } catch (e) {}
     });
   }
