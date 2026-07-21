@@ -383,6 +383,13 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
    Dropping to an opaque background removes the readback and costs nothing
    visually: --menu-bg was already 92% opaque. */
 @media (hover:none) and (pointer:coarse) {
+  /* Width is keyed on TOUCH, not on a pixel breakpoint, so it can never disagree
+     with the icon-only rule below. Previously a 561-900px touch device (foldable,
+     tablet, phone in landscape) took --dock-w:560px from the width query while
+     this block stripped its labels: a 560px bar holding four 20px icons.
+     One compact pill on every touch device instead. */
+  :root { --dock-w:344px; --dock-clear:128px; }
+  .dock-item svg { width:22px; height:22px; }
   .dock, .dock-menu {
     background:var(--menu-solid);
     -webkit-backdrop-filter:none; backdrop-filter:none;
