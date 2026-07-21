@@ -24,7 +24,7 @@
   --dock-w:480px; --dock-clear:150px;
   --shadow:0 24px 60px -26px rgba(0,0,0,0.8);
   --dots:rgba(255,255,255,0.9); --dots-op:0.05;
-  --menu-bg:rgba(17,9,40,0.92);
+  --menu-bg:rgba(17,9,40,0.92); --menu-solid:#110928;
 
   --font-head:"Space Grotesk","Segoe UI",system-ui,sans-serif;
   --font-body:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
@@ -47,7 +47,7 @@
 
   --shadow:0 22px 48px -28px rgba(60,30,110,0.35);
   --dots:rgba(23,16,43,0.9); --dots-op:0.055;
-  --menu-bg:rgba(255,253,255,0.92);
+  --menu-bg:rgba(255,253,255,0.92); --menu-solid:#fffdff;
 }
 
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -244,6 +244,7 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   padding:10px 10px; border-radius:22px;
   background:var(--menu-bg); backdrop-filter:blur(20px) saturate(1.3);
   border:1px solid var(--border);
+  will-change:transform; backface-visibility:hidden;
   animation:dockIn .55s cubic-bezier(.2,.8,.2,1) both, dockGlow 4.5s ease-in-out infinite .6s; }
 @keyframes dockIn {
   from { opacity:0; transform:translate3d(0,26px,0); }
@@ -359,6 +360,29 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   .stat-label { margin:0; max-width:none; }
   .chips li { font-size:0.9rem; padding:10px 16px; }
   .footer-inner { flex-direction:column; align-items:flex-start; }
+}
+
+/* =============== Touch devices: keep the dock rock-solid while scrolling ===============
+   Must stay LAST so it wins over the .dock / .dock-menu / .dock::before rules above.
+
+   A position:fixed bar that also runs backdrop-filter is a live blur of
+   everything scrolling underneath it, so Chrome on Android re-rasterises that
+   layer every single frame. On many phone GPUs it gives up mid-scroll and the
+   bar blinks out until you stop — the "not visible all the time" symptom.
+   Dropping to an opaque background removes the readback and costs nothing
+   visually: --menu-bg was already 92% opaque. */
+@media (hover:none) and (pointer:coarse) {
+  .dock, .dock-menu {
+    background:var(--menu-solid);
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+  }
+  /* The masked conic-gradient border is the other per-frame GPU cost on that
+     same layer — freeze it. The centre button keeps its running light. */
+  .dock::before { animation:none; opacity:0.6; }
+  /* Static shadow instead of the pulsing dockGlow, so the layer never needs
+     repainting once the entrance animation has finished. */
+  .dock { animation:dockIn .55s cubic-bezier(.2,.8,.2,1) both;
+    box-shadow:0 18px 44px -14px rgba(0,0,0,0.55), 0 0 26px -6px var(--accent-glow); }
 }
 
 @media (prefers-reduced-motion:reduce) {
