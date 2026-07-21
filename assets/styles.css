@@ -51,11 +51,16 @@
 }
 
 * { box-sizing:border-box; margin:0; padding:0; }
-html { scroll-behavior:smooth; scroll-padding-top:24px; }
-/* NOTE: overflow-x must be `clip`, not `hidden`. `hidden` makes the body a scroll
-   container on mobile, which breaks position:fixed (the dock stops sticking). */
+/* NOTE: the horizontal clip lives on <html>, NOT <body>, and must be `clip`
+   rather than `hidden`:
+     - `hidden` makes the element a scroll container, which on mobile turns it
+       into the containing block for fixed children — the dock stops sticking.
+     - on <body> it is also risky: engines that don't propagate body overflow to
+       the viewport treat body as a clip box and crop the fixed dock away.
+   On <html> the value propagates to the viewport and no clip box is created. */
+html { scroll-behavior:smooth; scroll-padding-top:24px; overflow-x:clip; }
 body { font-family:var(--font-body); background:var(--bg); color:var(--text); line-height:1.6;
-  -webkit-font-smoothing:antialiased; overflow-x:clip; transition:background .3s ease, color .3s ease; }
+  -webkit-font-smoothing:antialiased; overflow-x:visible; transition:background .3s ease, color .3s ease; }
 .container { width:100%; max-width:var(--maxw); margin:0 auto; padding:0 22px; }
 h1,h2,h3 { font-family:var(--font-head); line-height:1.08; letter-spacing:-0.025em; font-weight:700; }
 a { color:inherit; text-decoration:none; }
@@ -230,7 +235,10 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
 .dock { position:fixed; z-index:70;
   left:0; right:0; margin-inline:auto;
   width:min(var(--dock-w), calc(100% - 20px)); max-width:calc(100% - 20px);
-  bottom:calc(14px + env(safe-area-inset-bottom));
+  /* --dock-lift is set by script.js from visualViewport, so the bar stays glued
+     to the *visible* bottom edge when the on-screen keyboard opens or the user
+     pinch-zooms — cases where plain position:fixed drifts off-screen. */
+  bottom:calc(14px + env(safe-area-inset-bottom) + var(--dock-lift, 0px));
   transform:translateZ(0);
   display:grid; grid-template-columns:1fr 1fr auto 1fr 1fr; gap:2px; align-items:center;
   padding:10px 10px; border-radius:22px;

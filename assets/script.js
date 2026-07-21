@@ -134,6 +134,35 @@
     });
   }
 
+  /* ---- Keep the dock pinned to the visible viewport ----
+     position:fixed is anchored to the layout viewport, which on mobile drifts
+     away from what the user actually sees when the keyboard opens or they
+     pinch-zoom. visualViewport reports the real visible box, so we lift the
+     dock by the difference and it stays glued to the bottom in every view. */
+  var vv = window.visualViewport;
+  if (vv) {
+    var root = document.documentElement;
+    // Browsers already re-pin fixed elements when the address bar collapses, so
+    // only compensate for a shrink big enough to be the on-screen keyboard —
+    // anything smaller and we'd double-shift the dock up the screen.
+    var KEYBOARD_MIN = 150;
+    var syncDock = function () {
+      var hidden = root.clientHeight - (vv.height + vv.offsetTop);
+      var lift = hidden > KEYBOARD_MIN ? hidden : 0;
+      root.style.setProperty("--dock-lift", Math.round(lift) + "px");
+    };
+    var queued = false;
+    var onViewportChange = function () {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () { queued = false; syncDock(); });
+    };
+    vv.addEventListener("resize", onViewportChange);
+    vv.addEventListener("scroll", onViewportChange);
+    window.addEventListener("orientationchange", onViewportChange);
+    syncDock();
+  }
+
   /* ---- Light / dark theme toggle ---- */
   var themeBtn = document.getElementById("themeToggle");
   if (themeBtn) {
