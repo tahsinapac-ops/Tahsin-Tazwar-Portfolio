@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>OutsourceToBD — Visual Ad Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#0d0720; --bg-2:#150c2e;
+  --surface:rgba(255,255,255,.05); --surface-2:rgba(255,255,255,.085);
+  --border:rgba(255,255,255,.11);
+  --text:#f5f2fd; --muted:#b3a8cf; --faint:#82769f;
+  --accent:#a855f7; --accent-deep:#7c3aed; --cyan:#22d3ee; --orange:#ff8a2b;
+  --grad-text:linear-gradient(120deg,#c4b5fd 0%,#a855f7 45%,#f0abfc 100%);
+  --radius:16px; --maxw:1080px;
+  --font-head:"Space Grotesk","Segoe UI",system-ui,sans-serif;
+  --font-body:"Inter","Segoe UI",system-ui,sans-serif;
+  --font-serif:"Instrument Serif",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:radial-gradient(1100px 700px at 12% -8%,#1d1040 0%,transparent 60%),
+             radial-gradient(900px 600px at 100% 0%,#241046 0%,transparent 55%),
+             var(--bg);
+  color:var(--text);font-family:var(--font-body);line-height:1.6;
+  -webkit-font-smoothing:antialiased;padding-bottom:80px;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* ---------- masthead: logo top-left ---------- */
+.masthead{
+  position:sticky;top:0;z-index:20;
+  backdrop-filter:blur(14px);background:rgba(13,7,32,.72);
+  border-bottom:1px solid var(--border);
+}
+.masthead .wrap{display:flex;align-items:center;gap:16px;
+  padding-top:14px;padding-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px;margin-right:auto}
+.brand img{height:38px;width:auto;display:block}
+.brand .divider{width:1px;height:26px;background:var(--border)}
+.brand .kicker{font-family:var(--font-head);font-size:.72rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted)}
+.masthead .meta{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);font-family:var(--font-head)}
+
+/* ---------- hero ---------- */
+.hero{padding:78px 0 46px}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-family:var(--font-head);
+  font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--border);background:var(--surface);
+  padding:7px 14px;border-radius:999px}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 12px var(--accent)}
+h1{font-family:var(--font-head);font-size:clamp(2.1rem,5.2vw,3.4rem);line-height:1.08;
+  letter-spacing:-.02em;margin:22px 0 18px;max-width:18ch}
+h1 em{font-family:var(--font-serif);font-style:italic;font-weight:400;
+  background:var(--grad-text);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent}
+.lede{color:var(--muted);font-size:1.06rem;max-width:62ch}
+.lede strong{color:var(--text);font-weight:600}
+
+.brief{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:1px;background:var(--border);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;margin-top:38px}
+.brief div{background:var(--bg-2);padding:18px 20px}
+.brief dt{font-family:var(--font-head);font-size:.66rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.brief dd{font-size:.94rem;color:var(--text)}
+
+/* ---------- concepts ---------- */
+.sechead{display:flex;align-items:baseline;gap:14px;margin:64px 0 22px}
+.sechead h2{font-family:var(--font-head);font-size:1.05rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);font-weight:500;white-space:nowrap}
+.sechead .rule{flex:1;height:1px;background:var(--border)}
+
+.card{background:linear-gradient(160deg,var(--surface-2),var(--surface));
+  border:1px solid var(--border);border-radius:var(--radius);
+  padding:30px 32px;margin-bottom:20px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;
+  background:linear-gradient(180deg,var(--accent),transparent)}
+.card.pick{border-color:rgba(168,85,247,.45);
+  box-shadow:0 24px 60px -30px rgba(168,85,247,.6)}
+.card-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.num{font-family:var(--font-head);font-size:.72rem;letter-spacing:.18em;color:var(--faint)}
+.card h3{font-family:var(--font-head);font-size:1.5rem;letter-spacing:-.01em}
+.badge{font-family:var(--font-head);font-size:.62rem;letter-spacing:.14em;
+  text-transform:uppercase;padding:5px 10px;border-radius:999px;
+  border:1px solid rgba(168,85,247,.5);color:#e9d5ff;background:rgba(168,85,247,.14)}
+.badge.cool{border-color:rgba(34,211,238,.45);color:#a5f3fc;background:rgba(34,211,238,.12)}
+.badge.warm{border-color:rgba(255,138,43,.45);color:#fed7aa;background:rgba(255,138,43,.12)}
+.card .sub{color:var(--faint);font-size:.86rem;margin-bottom:18px}
+
+.row{display:grid;grid-template-columns:104px 1fr;gap:14px;
+  padding:12px 0;border-top:1px solid var(--border)}
+.row .k{font-family:var(--font-head);font-size:.66rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);padding-top:4px}
+.row .v{color:var(--muted);font-size:.95rem}
+.row .v b{color:var(--text);font-weight:600}
+.line{font-family:var(--font-serif);font-style:italic;font-size:1.22rem;
+  color:#e9d5ff;line-height:1.4}
+
+.beats{list-style:none;counter-reset:b}
+.beats li{counter-increment:b;position:relative;padding-left:30px;margin-bottom:9px;
+  color:var(--muted);font-size:.95rem}
+.beats li::before{content:counter(b);position:absolute;left:0;top:1px;
+  width:19px;height:19px;border-radius:50%;background:var(--surface-2);
+  border:1px solid var(--border);font-family:var(--font-head);font-size:.66rem;
+  display:flex;align-items:center;justify-content:center;color:var(--accent)}
+
+.foot{margin-top:64px;padding-top:26px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  color:var(--faint);font-size:.82rem}
+.foot img{height:26px;opacity:.8}
+@media(max-width:640px){
+  .row{grid-template-columns:1fr;gap:4px}
+  .card{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">
+      <img src="assets/otb-logo.png" alt="Outsource to Bangladesh" />
+      <span class="divider"></span>
+      <span class="kicker">Creative Concepts</span>
+    </div>
+    <span class="meta">Draft 01</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="eyebrow"><span class="dot"></span> Visual Advertising · outsourcetobd.com</span>
+    <h1>Five ways to sell <em>trust</em>, not cheap labour.</h1>
+    <p class="lede">The product is not Bangladesh. The product is <strong>a decision a foreign buyer is
+      nervous about, de-risked.</strong> Every concept below turns on the same insight from the OTB
+      positioning — talent is not the gap, <strong>verified trust</strong> is.</p>
+
+    <dl class="brief">
+      <div><dt>Audience</dt><dd>CTOs, procurement leads &amp; founders — US, EU, Gulf</dd></div>
+      <div><dt>Format</dt><dd>30–45s film, 16:9 + 9:16 cutdowns</dd></div>
+      <div><dt>Channels</dt><dd>LinkedIn, YouTube pre-roll, GITEX booth loop</dd></div>
+      <div><dt>Proposition</dt><dd>The trusted gateway to verified BD tech companies</dd></div>
+    </dl>
+  </section>
+
+  <div class="sechead"><h2>The Concepts</h2><span class="rule"></span></div>
+
+  <!-- 1 -->
+  <article class="card pick">
+    <div class="card-top">
+      <span class="num">01</span>
+      <h3>The Tab You Didn't Close</h3>
+      <span class="badge">Recommended</span>
+      <span class="badge cool">Low budget</span>
+    </div>
+    <p class="sub">Screen-life realism · 35s · one actor, one location</p>
+
+    <div class="row"><span class="k">Plot</span><div class="v">
+      <ol class="beats">
+        <li>11pm, dark office. A CTO stares at twelve browser tabs — freelancer profiles, agency landing pages, a Reddit thread titled <b>"has anyone actually outsourced to…"</b></li>
+        <li>They close them one by one. The sound design is a countdown.</li>
+        <li>Cursor hovers over the last tab: a verified OTB company profile — real team photo, audit badge, named client, delivery record.</li>
+        <li>They don't close it. Laptop shuts. Cut to morning: same face on a video call, laughing with a Dhaka team.</li>
+      </ol></div></div>
+
+    <div class="row"><span class="k">Why it works</span><div class="v">Sells the <b>before</b> feeling — decision fatigue and fear of getting burned — instead of selling a country. The product becomes the one tab that survived the cull.</div></div>
+    <div class="row"><span class="k">Look</span><div class="v">Screen-recording realism, cold blue monitor glow → warm daylight at the turn. No music until the last tab.</div></div>
+    <div class="row"><span class="k">End card</span><div class="v"><span class="line">"Stop shortlisting strangers."</span><br />OutsourceToBD.com — verified Bangladeshi tech companies.</div></div>
+  </article>
+
+  <!-- 2 -->
+  <article class="card">
+    <div class="card-top">
+      <span class="num">02</span>
+      <h3>Split Screen / Same Hands</h3>
+      <span class="badge cool">Silent-autoplay proof</span>
+    </div>
+    <p class="sub">Wordless visual argument · 30s · travels across every language</p>
+
+    <div class="row"><span class="k">Plot</span><div class="v">
+      <ol class="beats">
+        <li>A hard vertical split holds for the entire film.</li>
+        <li><b>Left:</b> a product in use — a fintech app in Dubai, a hospital dashboard in Berlin, a logistics scanner in Toronto.</li>
+        <li><b>Right:</b> the exact matching moment being built in Dhaka. Same gesture, same rhythm, hands mirroring across the seam.</li>
+        <li>Final shot: the seam dissolves. It was one room all along.</li>
+      </ol></div></div>
+
+    <div class="row"><span class="k">Why it works</span><div class="v">No VO needed until the last line, so it lands in a muted feed. Argues by rhyme rather than by claim.</div></div>
+    <div class="row"><span class="k">Line</span><div class="v"><span class="line">"You've already been using it."</span></div></div>
+  </article>
+
+  <!-- 3 -->
+  <article class="card">
+    <div class="card-top">
+      <span class="num">03</span>
+      <h3>The Verification</h3>
+      <span class="badge warm">Highest trust weight</span>
+    </div>
+    <p class="sub">Documentary, no actors · 45s · doubles as sales-deck &amp; booth asset</p>
+
+    <div class="row"><span class="k">Plot</span><div class="v">
+      <ol class="beats">
+        <li>Follow one real onboarding: the OTB team walks into a Bangladeshi company's office.</li>
+        <li>They check delivery records, meet the engineers, sit in on a stand-up, sign off.</li>
+        <li>Intercut with a buyer on the other side of the world reading that same finished profile.</li>
+        <li>Hard cut to type: <b>"127 companies applied. 41 are listed."</b></li>
+      </ol></div></div>
+
+    <div class="row"><span class="k">Why it works</span><div class="v">Scarcity and <b>rejection</b> are the strongest trust signals in a market where trust is the entire problem. This is the film that converts skeptical procurement.</div></div>
+    <div class="row"><span class="k">Reuse</span><div class="v">Cuts down into the GITEX pavilion loop and the partner proposal deck already in production.</div></div>
+  </article>
+
+  <!-- 4 -->
+  <article class="card">
+    <div class="card-top">
+      <span class="num">04</span>
+      <h3>Time Zones</h3>
+      <span class="badge cool">Low budget</span>
+    </div>
+    <p class="sub">Light and shareable · 20s · one prop, one match-cut engine</p>
+
+    <div class="row"><span class="k">Plot</span><div class="v">
+      <ol class="beats">
+        <li><b>6pm London</b> — a founder closes the laptop mid-problem.</li>
+        <li><b>11pm Dhaka</b> — the work continues under different light.</li>
+        <li><b>8am London</b> — the fix is already in the inbox.</li>
+        <li>Every cut lands on the same coffee cup: filled, emptied, filled.</li>
+      </ol></div></div>
+
+    <div class="row"><span class="k">Line</span><div class="v"><span class="line">"Your night shift already clocked in."</span></div></div>
+  </article>
+
+  <!-- 5 -->
+  <article class="card">
+    <div class="card-top">
+      <span class="num">05</span>
+      <h3>Five Frames</h3>
+      <span class="badge cool">Ship this week</span>
+    </div>
+    <p class="sub">Static carousel · no shoot · OTB dark plate + gold type</p>
+
+    <div class="row"><span class="k">Frames</span><div class="v">
+      <ol class="beats">
+        <li>"You wouldn't hire an engineer without a reference."</li>
+        <li>"So why hire an agency without one?"</li>
+        <li>"Every company on OutsourceToBD is verified in person."</li>
+        <li>Three client logos + one hard number.</li>
+        <li>CTA — <b>Browse verified companies →</b></li>
+      </ol></div></div>
+
+    <div class="row"><span class="k">Why it works</span><div class="v">Costs nothing, tests the message before you commit a production budget to concepts 01–03.</div></div>
+  </article>
+
+  <div class="sechead"><h2>Production Note</h2><span class="rule"></span></div>
+  <article class="card">
+    <div class="row" style="border-top:none"><span class="k">Cheap</span><div class="v"><b>01</b> and <b>04</b> shoot for almost nothing — screen capture plus a single location and one performer.</div></div>
+    <div class="row"><span class="k">Valuable</span><div class="v"><b>03</b> needs real access to a member company, but it is the highest-value asset in the set: one shoot yields the ad, the sales-deck video and the GITEX booth loop.</div></div>
+    <div class="row"><span class="k">Sequence</span><div class="v">Run <b>05</b> as a message test → produce <b>01</b> as the paid-media film → shoot <b>03</b> alongside the next verification visit.</div></div>
+  </article>
+
+  <div class="foot">
+    <img src="assets/otb-logo.png" alt="Outsource to Bangladesh" />
+    <span>Real companies · Real verification · Real assurance — outsourcetobd.com</span>
+  </div>
+
+</main>
+</body>
+</html>

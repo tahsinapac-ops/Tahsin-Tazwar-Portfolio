@@ -176,6 +176,79 @@
     syncDock();
   }
 
+  /* ---- Dock diagnostics: load the site with #dockdebug to enable ----
+     Off for every normal visitor. Reports what the dock is ACTUALLY doing on a
+     real device, so the bar can be debugged without a desktop DevTools cable. */
+  if (window.location.hash.indexOf("dockdebug") > -1) {
+    var dock = document.querySelector(".dock");
+    var panel = document.createElement("pre");
+    panel.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:999;margin:0;" +
+      "padding:8px 10px;font:11px/1.45 monospace;white-space:pre-wrap;" +
+      "background:#000;color:#0f0;border-bottom:2px solid #0f0;max-height:56vh;overflow:auto";
+    document.body.appendChild(panel);
+
+    var mq = function (q) { return window.matchMedia(q).matches ? "YES" : "no"; };
+    var report = function () {
+      var d = document.documentElement;
+      var r = dock ? dock.getBoundingClientRect() : null;
+      var cs = dock ? getComputedStyle(dock) : null;
+      var visH = vv ? vv.height : window.innerHeight;
+      // Walk up from the dock: any ancestor with transform/filter/will-change/
+      // contain/perspective steals the containing block from a fixed child and
+      // is THE classic cause of a fixed bar scrolling away with the page.
+      var culprits = [];
+      for (var el = dock && dock.parentElement; el; el = el.parentElement) {
+        var s = getComputedStyle(el);
+        var bad = [];
+        if (s.transform !== "none") bad.push("transform");
+        if (s.filter !== "none") bad.push("filter");
+        if (s.perspective !== "none") bad.push("perspective");
+        if (s.contain && s.contain !== "none") bad.push("contain:" + s.contain);
+        if (s.willChange && s.willChange !== "auto") bad.push("will-change:" + s.willChange);
+        if (s.overflow !== "visible") bad.push("overflow:" + s.overflow);
+        if (bad.length) culprits.push("  <" + el.tagName.toLowerCase() + "> " + bad.join(", "));
+      }
+      panel.textContent = [
+        "scrollY        " + Math.round(window.scrollY),
+        "innerHeight    " + window.innerHeight,
+        "clientHeight   " + d.clientHeight,
+        "vv.height      " + Math.round(visH) + "   offsetTop " + (vv ? Math.round(vv.offsetTop) : "-") +
+          "   scale " + (vv ? vv.scale : "-"),
+        "--dock-lift    " + (d.style.getPropertyValue("--dock-lift") || "(unset)"),
+        "",
+        "innerWidth     " + window.innerWidth + "   clientWidth " + d.clientWidth +
+          "   dpr " + window.devicePixelRatio,
+        "",
+        "dock position  " + (cs ? cs.position : "NO DOCK FOUND"),
+        "dock rect      left " + (r ? Math.round(r.left) : "-") + "  right " + (r ? Math.round(r.right) : "-") +
+          "  width " + (r ? Math.round(r.width) : "-"),
+        "dock fits      " + (r ? (r.left >= -1 && r.right <= d.clientWidth + 1 ? "YES" : "NO - OVERFLOWS") : "-"),
+        "dock scrollW   " + (dock ? dock.scrollWidth : "-") + " (> width means CONTENT overflows)",
+        "last item      " + (function () {
+          var last = dock && dock.querySelector("#dockMenuBtn");
+          if (!last) return "not found";
+          var lr = last.getBoundingClientRect();
+          return "right " + Math.round(lr.right) +
+            (lr.right <= d.clientWidth + 1 ? "  (on screen)" : "  OFF SCREEN");
+        })(),
+        "dock rect      top " + (r ? Math.round(r.top) : "-") + "  bottom " + (r ? Math.round(r.bottom) : "-"),
+        "dock visible   " + (r ? (r.bottom <= visH + 1 && r.top >= -1 ? "YES" : "NO - OFF SCREEN") : "-"),
+        "dock opacity   " + (cs ? cs.opacity : "-") + "   display " + (cs ? cs.display : "-"),
+        "dock bottom    " + (cs ? cs.bottom : "-"),
+        "",
+        "touch media    hover:none " + mq("(hover:none)") + "   pointer:coarse " + mq("(pointer:coarse)"),
+        "width media    <=560 " + mq("(max-width:560px)") + "   561-900 " + mq("(min-width:561px) and (max-width:900px)"),
+        "",
+        "ancestors that break position:fixed:",
+        culprits.length ? culprits.join("\n") : "  none"
+      ].join("\n");
+    };
+    report();
+    window.addEventListener("scroll", report, { passive: true });
+    window.addEventListener("resize", report);
+    if (vv) { vv.addEventListener("resize", report); vv.addEventListener("scroll", report); }
+  }
+
   /* ---- Light / dark theme toggle ---- */
   var themeBtn = document.getElementById("themeToggle");
   if (themeBtn) {
