@@ -235,7 +235,11 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
      This is bulletproof in a way `width:min(...)` is not, because it never has
      to resolve a percentage against the initial containing block. */
   left:10px; right:10px; width:auto; max-width:var(--dock-w); margin-inline:auto;
-  bottom:calc(14px + env(safe-area-inset-bottom));
+  /* --dock-lift (set by script.js) compensates for Chrome Android keeping the
+     layout viewport at its tall URL-bar-hidden size: while the URL bar is on
+     screen, "the bottom" is below the visible area and the bar vanishes. */
+  bottom:calc(14px + env(safe-area-inset-bottom) + var(--dock-lift, 0px));
+  transition:bottom .15s linear;
   transform:translateZ(0);
   /* Flex, not grid. Grid `fr` tracks are floored at their item's min-content
      width, so the tracks refused to shrink, the row overflowed to the right and
