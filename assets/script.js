@@ -169,6 +169,10 @@
     vv.addEventListener("resize", onViewportChange);
     vv.addEventListener("scroll", onViewportChange);
     window.addEventListener("orientationchange", onViewportChange);
+    // Chrome Android slides its URL bar away DURING a page scroll and does not
+    // always fire visualViewport.resize until the slide finishes — re-measure on
+    // scroll too, or the dock lags off-screen for the length of the animation.
+    window.addEventListener("scroll", onViewportChange, { passive: true });
     syncDock();
   }
 
