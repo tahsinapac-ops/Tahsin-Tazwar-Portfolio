@@ -334,12 +334,18 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
    Same 560px breakpoint as the rest of the phone rules below — a mismatched
    threshold left 521-560px wide devices showing labels in a cramped bar. */
 @media (max-width:560px) {
-  .dock { padding:12px 8px; gap:0; }
+  /* Cap the pill instead of letting it stretch to (viewport - 20px). On a 412px
+     Android that was a 392px bar holding four 22px icons — mostly empty space.
+     344px keeps the icons in a tight cluster with a real margin either side, and
+     still shrinks to fit 320px phones because left/right:10px wins over max-width. */
+  :root { --dock-w:344px; }
+  .dock { padding:9px 6px; gap:0; border-radius:20px;
+    bottom:calc(12px + env(safe-area-inset-bottom)); }
   .dock-item span { display:none; }
   .dock-item { padding:2px 0; }
-  .dock-item svg { width:23px; height:23px; }
-  .dock-center { width:56px; height:56px; margin:-28px 6px 0; }
-  .dock-center span { display:block; font-size:24px; }
+  .dock-item svg { width:22px; height:22px; }
+  .dock-center { width:52px; height:52px; margin:-26px 4px 0; border-width:3px; }
+  .dock-center span { display:block; font-size:22px; }
   .dock-menu { min-width:200px; right:2px; max-width:calc(100vw - 24px); }
 }
 
@@ -353,7 +359,9 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
 }
 
 @media (max-width:560px) {
-  :root { --dock-clear:140px; }
+  /* Dock is now shorter on phones (9px padding, 52px centre button), so the
+     footer needs less reserved space below the copyright line. */
+  :root { --dock-clear:128px; }
   .container { padding:0 16px; }
   .hero { padding-top:26px; }
   .hero-actions .btn, .book-actions .btn { flex:1 1 auto; }
