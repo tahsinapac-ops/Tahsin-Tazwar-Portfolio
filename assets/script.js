@@ -134,47 +134,7 @@
     });
   }
 
-  /* ---- Keep the dock pinned to the visible viewport ----
-     position:fixed is anchored to the layout viewport, which on mobile drifts
-     away from what the user actually sees when the keyboard opens or they
-     pinch-zoom. visualViewport reports the real visible box, so we lift the
-     dock by the difference and it stays glued to the bottom in every view. */
   var vv = window.visualViewport;
-  if (vv) {
-    var root = document.documentElement;
-    // How much of the layout viewport is currently NOT visible at the bottom.
-    // This one measurement is correct on every engine, which is why it is applied
-    // unconditionally rather than gated on a guessed threshold:
-    //   Chrome Android - layout viewport is the FULL-height (URL-bar-hidden) box,
-    //     so while the URL bar is on screen this is ~56-100px and the dock would
-    //     otherwise sit below the visible area. We lift it back into view.
-    //   iOS Safari - the layout viewport is resized with the toolbars, so
-    //     clientHeight already equals vv.height and this evaluates to ~0. No
-    //     double-shift; the lift simply stays inactive.
-    //   Any platform, keyboard open - the visual viewport shrinks by the keyboard
-    //     height and the same expression lifts the dock above it.
-    var syncDock = function () {
-      var hidden = root.clientHeight - (vv.height + vv.offsetTop);
-      // Clamp: never push the bar more than half the screen up, and ignore
-      // sub-pixel noise so we are not writing a style on every scroll frame.
-      var lift = Math.min(Math.max(hidden, 0), vv.height * 0.5);
-      root.style.setProperty("--dock-lift", (lift < 2 ? 0 : Math.round(lift)) + "px");
-    };
-    var queued = false;
-    var onViewportChange = function () {
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(function () { queued = false; syncDock(); });
-    };
-    vv.addEventListener("resize", onViewportChange);
-    vv.addEventListener("scroll", onViewportChange);
-    window.addEventListener("orientationchange", onViewportChange);
-    // Chrome Android slides its URL bar away DURING a page scroll and does not
-    // always fire visualViewport.resize until the slide finishes — re-measure on
-    // scroll too, or the dock lags off-screen for the length of the animation.
-    window.addEventListener("scroll", onViewportChange, { passive: true });
-    syncDock();
-  }
 
   /* ---- Dock diagnostics: load the site with #dockdebug to enable ----
      Off for every normal visitor. Reports what the dock is ACTUALLY doing on a
@@ -214,7 +174,6 @@
         "clientHeight   " + d.clientHeight,
         "vv.height      " + Math.round(visH) + "   offsetTop " + (vv ? Math.round(vv.offsetTop) : "-") +
           "   scale " + (vv ? vv.scale : "-"),
-        "--dock-lift    " + (d.style.getPropertyValue("--dock-lift") || "(unset)"),
         "",
         "innerWidth     " + window.innerWidth + "   clientWidth " + d.clientWidth +
           "   dpr " + window.devicePixelRatio,
