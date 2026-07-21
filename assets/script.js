@@ -142,14 +142,23 @@
   var vv = window.visualViewport;
   if (vv) {
     var root = document.documentElement;
-    // Browsers already re-pin fixed elements when the address bar collapses, so
-    // only compensate for a shrink big enough to be the on-screen keyboard —
-    // anything smaller and we'd double-shift the dock up the screen.
-    var KEYBOARD_MIN = 150;
+    // How much of the layout viewport is currently NOT visible at the bottom.
+    // This one measurement is correct on every engine, which is why it is applied
+    // unconditionally rather than gated on a guessed threshold:
+    //   Chrome Android - layout viewport is the FULL-height (URL-bar-hidden) box,
+    //     so while the URL bar is on screen this is ~56-100px and the dock would
+    //     otherwise sit below the visible area. We lift it back into view.
+    //   iOS Safari - the layout viewport is resized with the toolbars, so
+    //     clientHeight already equals vv.height and this evaluates to ~0. No
+    //     double-shift; the lift simply stays inactive.
+    //   Any platform, keyboard open - the visual viewport shrinks by the keyboard
+    //     height and the same expression lifts the dock above it.
     var syncDock = function () {
       var hidden = root.clientHeight - (vv.height + vv.offsetTop);
-      var lift = hidden > KEYBOARD_MIN ? hidden : 0;
-      root.style.setProperty("--dock-lift", Math.round(lift) + "px");
+      // Clamp: never push the bar more than half the screen up, and ignore
+      // sub-pixel noise so we are not writing a style on every scroll frame.
+      var lift = Math.min(Math.max(hidden, 0), vv.height * 0.5);
+      root.style.setProperty("--dock-lift", (lift < 2 ? 0 : Math.round(lift)) + "px");
     };
     var queued = false;
     var onViewportChange = function () {
