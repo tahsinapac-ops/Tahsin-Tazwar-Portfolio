@@ -358,24 +358,36 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
 /* Phones: icon-only dock so it can never overflow the screen.
    Same 560px breakpoint as the rest of the phone rules below — a mismatched
    threshold left 521-560px wide devices showing labels in a cramped bar. */
+/* Phones / narrow windows: APP-STYLE BOTTOM BAR, not a floating pill.
+   Edge-to-edge and anchored to the very bottom like a native tab bar.
+   Full-bleed left/right means there is no centring math left to go wrong: the
+   bar cannot be off-centre, cannot be clipped at one edge, cannot overflow.
+   The safe-area inset moves INTO padding-bottom so the bar's background extends
+   under the home indicator while the icons sit above it — the native-app look. */
 @media (max-width:560px) {
-  /* Cap the pill instead of letting it stretch to (viewport - 20px). On a 412px
-     Android that was a 392px bar holding four 22px icons — mostly empty space.
-     344px keeps the icons in a tight cluster with a real margin either side, and
-     still shrinks to fit 320px phones because left/right:10px wins over max-width. */
-  :root { --dock-w:344px; }
-  /* var(--dock-lift) MUST be repeated in every `bottom` override. Omitting it
+  /* var(--dock-lift) MUST be carried by every `bottom` override. Omitting it
      here silently cancelled the URL-bar compensation on exactly the devices that
      need it — the dock vanished on scroll-up on every phone under 560px while
      the base rule above looked correct. */
-  .dock { padding:9px 6px; gap:0; border-radius:20px;
-    bottom:calc(12px + env(safe-area-inset-bottom) + var(--dock-lift, 0px)); }
+  .dock { left:0; right:0; max-width:none; margin:0;
+    bottom:var(--dock-lift, 0px);
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    gap:0; border:0; border-radius:0; }
   .dock-item span { display:none; }
   .dock-item { padding:2px 0; }
   .dock-item svg { width:22px; height:22px; }
   .dock-center { width:52px; height:52px; margin:-26px 4px 0; border-width:3px; }
   .dock-center span { display:block; font-size:22px; }
-  .dock-menu { min-width:200px; right:2px; max-width:calc(100vw - 24px); }
+  .dock-menu { min-width:200px; right:10px; max-width:calc(100vw - 24px); }
+  /* Brand hairline along the bar's top edge replaces the pill's gradient ring.
+     A plain 2px gradient strip needs no mask, so it is safe on every engine —
+     display:block here deliberately overrides the @supports-guarded ring above
+     (equal specificity, later in the file wins). */
+  .dock::before { content:""; display:block; position:absolute; pointer-events:none;
+    inset:auto; top:0; left:0; right:0; height:2px;
+    padding:0; border-radius:0; -webkit-mask:none; mask:none;
+    background:linear-gradient(90deg, var(--accent), var(--pink) 50%, var(--cyan));
+    animation:none; opacity:1; }
 }
 
 /* Landscape phones: short viewports need a slimmer bar and less footer padding */
@@ -413,40 +425,42 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
    Dropping to an opaque background removes the readback and costs nothing
    visually: --menu-bg was already 92% opaque. */
 @media (hover:none) and (pointer:coarse) {
-  /* Width is keyed on TOUCH, not on a pixel breakpoint, so it can never disagree
-     with the icon-only rule below. Previously a 561-900px touch device (foldable,
-     tablet, phone in landscape) took --dock-w:560px from the width query while
-     this block stripped its labels: a 560px bar holding four 20px icons.
-     One compact pill on every touch device instead. */
-  :root { --dock-w:344px; --dock-clear:128px; }
+  /* Keyed on TOUCH, not on a pixel breakpoint, so a 561-900px touch device
+     (foldable, tablet, phone in landscape) gets exactly the same app bar as a
+     390px phone — no width threshold to disagree with. */
+  :root { --dock-clear:128px; }
+  /* Same app-bar geometry as the narrow-width block above; duplicated because a
+     wide touch device matches only this query. `bottom` keeps var(--dock-lift). */
+  .dock { left:0; right:0; max-width:none; margin:0;
+    bottom:var(--dock-lift, 0px);
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    gap:0; border:0; border-radius:0; }
   .dock-item svg { width:22px; height:22px; }
+  /* Opaque background: a live backdrop blur on a fixed bar forces Chrome Android
+     to re-rasterise every frame and the bar blinks out mid-scroll on weak GPUs.
+     --menu-bg was already 92% opaque; solid costs nothing visually. */
   .dock, .dock-menu {
     background:var(--menu-solid);
     -webkit-backdrop-filter:none; backdrop-filter:none;
   }
   /* Icon-only on EVERY touch device, not just under a width threshold.
-     Text labels are what make a track demand horizontal space; drop them and
-     five columns cannot overflow no matter what the viewport reports. */
+     Text labels are what make an item demand horizontal space; drop them and
+     five items cannot overflow no matter what the viewport reports. */
   .dock-item span { display:none; }
   .dock-item { padding:2px 0; min-width:0; }
   .dock-item svg { flex:none; }
-  .dock-menu { max-width:calc(100vw - 24px); }
-  /* The masked conic-gradient border is the other per-frame GPU cost on that
-     same layer — freeze it. The centre button keeps its running light.
-     Freezing alone is not enough: --ang falls back to its 0deg initial value and
-     the conic only paints 0deg-118deg, so the colour sticks permanently in the
-     top-right corner and the rest of the pill is bare — an asymmetric edge that
-     reads as a rendering fault rather than a design. Swap in a STATIC linear
-     gradient that covers all four edges evenly. One paint, no animation, same
-     brand colours. */
-  .dock::before {
-    animation:none; opacity:0.75;
-    background:linear-gradient(100deg, var(--accent) 0%, var(--pink) 40%, var(--cyan) 75%, var(--accent) 100%);
-  }
-  /* Static shadow instead of the pulsing dockGlow, so the layer never needs
-     repainting once the entrance animation has finished. */
+  .dock-menu { min-width:200px; right:10px; max-width:calc(100vw - 24px); }
+  /* Top hairline instead of the masked conic ring: no mask, no per-frame GPU
+     cost, no frozen-arc artefact — safe on every engine. */
+  .dock::before { content:""; display:block; position:absolute; pointer-events:none;
+    inset:auto; top:0; left:0; right:0; height:2px;
+    padding:0; border-radius:0; -webkit-mask:none; mask:none;
+    background:linear-gradient(90deg, var(--accent), var(--pink) 50%, var(--cyan));
+    animation:none; opacity:1; }
+  /* Static upward shadow instead of the pulsing dockGlow, so the layer never
+     needs repainting once the entrance animation has finished. */
   .dock { animation:dockIn .55s cubic-bezier(.2,.8,.2,1) both;
-    box-shadow:0 18px 44px -14px rgba(0,0,0,0.55), 0 0 26px -6px var(--accent-glow); }
+    box-shadow:0 -10px 32px -14px rgba(0,0,0,0.5); }
 }
 
 @media (prefers-reduced-motion:reduce) {
