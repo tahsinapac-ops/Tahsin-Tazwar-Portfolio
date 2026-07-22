@@ -235,13 +235,14 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
      This is bulletproof in a way `width:min(...)` is not, because it never has
      to resolve a percentage against the initial containing block. */
   left:10px; right:10px; width:auto; max-width:var(--dock-w); margin-inline:auto;
-  /* Plain fixed offset - no JS compensation. Current engines already hold a
-     bottom-fixed element against the visible bottom while the URL bar animates.
-     There must be no `transition` on `bottom`: with one, any adjustment the
-     browser makes during a URL-bar slide gets replayed as a 150ms animation and
-     the bar visibly chases the scroll instead of staying put. See the long note
-     in script.js. */
-  bottom:calc(14px + env(safe-area-inset-bottom));
+  /* --dock-lift (set by script.js) compensates for Chrome Android keeping the
+     layout viewport at its tall URL-bar-hidden size: while the URL bar is on
+     screen "the bottom" is below the visible area and the bar vanishes on
+     scroll-up. Required - see the note in script.js before touching it.
+     NEVER put a transition on `bottom`. The lift has to land in the same frame
+     it is measured; a transition makes the dock arrive late and it visibly
+     slides up and down chasing the scroll instead of sitting still. */
+  bottom:calc(14px + env(safe-area-inset-bottom) + var(--dock-lift, 0px));
   transform:translateZ(0);
   /* Flex, not grid. Grid `fr` tracks are floored at their item's min-content
      width, so the tracks refused to shrink, the row overflowed to the right and
@@ -363,8 +364,12 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
      344px keeps the icons in a tight cluster with a real margin either side, and
      still shrinks to fit 320px phones because left/right:10px wins over max-width. */
   :root { --dock-w:344px; }
+  /* var(--dock-lift) MUST be repeated in every `bottom` override. Omitting it
+     here silently cancelled the URL-bar compensation on exactly the devices that
+     need it — the dock vanished on scroll-up on every phone under 560px while
+     the base rule above looked correct. */
   .dock { padding:9px 6px; gap:0; border-radius:20px;
-    bottom:calc(12px + env(safe-area-inset-bottom)); }
+    bottom:calc(12px + env(safe-area-inset-bottom) + var(--dock-lift, 0px)); }
   .dock-item span { display:none; }
   .dock-item { padding:2px 0; }
   .dock-item svg { width:22px; height:22px; }
@@ -376,7 +381,8 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
 /* Landscape phones: short viewports need a slimmer bar and less footer padding */
 @media (max-height:480px) and (orientation:landscape) {
   :root { --dock-clear:120px; }
-  .dock { padding:8px; bottom:calc(8px + env(safe-area-inset-bottom)); }
+  /* Carries var(--dock-lift) for the same reason as the phone block above. */
+  .dock { padding:8px; bottom:calc(8px + env(safe-area-inset-bottom) + var(--dock-lift, 0px)); }
   .dock-center { width:48px; height:48px; margin:-24px 6px 0; }
   .dock-center span { font-size:21px; }
   .dock-item svg { width:20px; height:20px; }
