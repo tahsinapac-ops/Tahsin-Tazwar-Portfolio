@@ -145,6 +145,15 @@
   if (vv) {
     var root = document.documentElement;
     var syncDock = function () {
+      // Pinch/page zoom shrinks vv.height in CSS px exactly the way a visible URL
+      // bar does, so the measurement below cannot tell them apart: at 2x zoom
+      // `hidden` reads ~half the layout height and the dock lifts hundreds of px
+      // to the middle of the screen. While the visitor is zoomed there is no URL
+      // bar to compensate for anyway — sit on the layout bottom and stay put.
+      if (vv.scale > 1.01) {
+        root.style.setProperty("--dock-lift", "0px");
+        return;
+      }
       var hidden = root.clientHeight - (vv.height + vv.offsetTop);
       var lift = Math.min(Math.max(hidden, 0), vv.height * 0.5);
       root.style.setProperty("--dock-lift", (lift < 2 ? 0 : Math.round(lift)) + "px");

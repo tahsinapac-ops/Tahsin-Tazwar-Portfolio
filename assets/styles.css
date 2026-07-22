@@ -257,13 +257,34 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   to   { opacity:1; transform:translateZ(0); }
 }
 
-/* continuous running light around the dock */
-.dock::before { content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1.8px; pointer-events:none;
-  background:conic-gradient(from var(--ang),
-     transparent 0deg, var(--accent) 26deg, var(--pink) 52deg, var(--cyan) 78deg, transparent 118deg, transparent 360deg);
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude;
-  animation:runLight 4.5s linear infinite; }
+/* Continuous running light around the dock.
+   The masked-gradient border trick DEPENDS on mask compositing: the mask is two
+   stacked layers (content-box + border-box) and only the xor/exclude composite
+   punches the middle out to leave a ring. Where that composite is unsupported
+   the mask degrades to "show everything" and the conic gradient FILLS the pill —
+   a solid blob painted over the icons, and on the centre button a disc over the
+   "T". So both are off by default and only switched on behind @supports; every
+   other engine keeps the plain 1px border, which looks intentional. */
+.dock::before, .dock-center::before { display:none; }
+
+@supports ((mask-composite:exclude) or (-webkit-mask-composite:xor)) {
+  .dock::before { display:block; content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1.8px; pointer-events:none;
+    background:conic-gradient(from var(--ang),
+       transparent 0deg, var(--accent) 26deg, var(--pink) 52deg, var(--cyan) 78deg, transparent 118deg, transparent 360deg);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:runLight 4.5s linear infinite; }
+
+  /* Centre button ring. Unlike the pill above this is a full 360° sweep with no
+     transparent stop, so it still reads correctly when frozen. */
+  .dock-center::before { display:block; content:""; position:absolute; inset:-6px; border-radius:50%; padding:2.5px; pointer-events:none;
+    background:conic-gradient(from var(--ang), var(--accent), var(--pink), var(--cyan), var(--accent));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:runLight 3.5s linear infinite; }
+}
 @keyframes runLight { to { --ang:360deg; } }
 @keyframes dockGlow {
   0%,100% { box-shadow:0 18px 44px -14px rgba(0,0,0,0.6), 0 0 20px -8px var(--accent-glow); }
@@ -288,11 +309,8 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   background:var(--grad); color:#fff; border:4px solid var(--bg);
   box-shadow:0 14px 34px -8px var(--accent-glow); transition:transform .2s; }
 .dock-center span { font-family:var(--font-logo); font-weight:900; font-size:27px; line-height:1; }
-.dock-center::before { content:""; position:absolute; inset:-6px; border-radius:50%; padding:2.5px; pointer-events:none;
-  background:conic-gradient(from var(--ang), var(--accent), var(--pink), var(--cyan), var(--accent));
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude;
-  animation:runLight 3.5s linear infinite; }
+/* .dock-center::before (the gradient ring) lives in the @supports block above,
+   next to .dock::before — both need the same mask-compositing guard. */
 .dock-center:hover { transform:translateY(-3px) scale(1.04); }
 .dock-center:active { transform:scale(0.95); }
 
@@ -406,8 +424,17 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   .dock-item svg { flex:none; }
   .dock-menu { max-width:calc(100vw - 24px); }
   /* The masked conic-gradient border is the other per-frame GPU cost on that
-     same layer — freeze it. The centre button keeps its running light. */
-  .dock::before { animation:none; opacity:0.6; }
+     same layer — freeze it. The centre button keeps its running light.
+     Freezing alone is not enough: --ang falls back to its 0deg initial value and
+     the conic only paints 0deg-118deg, so the colour sticks permanently in the
+     top-right corner and the rest of the pill is bare — an asymmetric edge that
+     reads as a rendering fault rather than a design. Swap in a STATIC linear
+     gradient that covers all four edges evenly. One paint, no animation, same
+     brand colours. */
+  .dock::before {
+    animation:none; opacity:0.75;
+    background:linear-gradient(100deg, var(--accent) 0%, var(--pink) 40%, var(--cyan) 75%, var(--accent) 100%);
+  }
   /* Static shadow instead of the pulsing dockGlow, so the layer never needs
      repainting once the entrance animation has finished. */
   .dock { animation:dockIn .55s cubic-bezier(.2,.8,.2,1) both;
@@ -419,5 +446,9 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   .reveal { opacity:1; transform:none; transition:none; }
   .hero-photo, .ring, .orb { animation:none; }
   .dock, .dock::before, .dock-center::before { animation:none; }
+  /* Same reason as the touch block: a frozen --ang leaves the pill's conic arc
+     stuck in the top-right corner. Reduced motion means no animation, not a
+     half-drawn border. */
+  .dock::before { background:linear-gradient(100deg, var(--accent) 0%, var(--pink) 40%, var(--cyan) 75%, var(--accent) 100%); }
   .btn:hover, .do-card:hover, .role-card:hover, .chips li:hover, .socials a:hover, .dock-item:hover { transform:none; }
 }
