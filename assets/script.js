@@ -134,44 +134,26 @@
     });
   }
 
-  /* ---- Keep the dock above the browser UI ----
-     position:fixed anchors to the LAYOUT viewport. Chrome Android holds that at
-     its full URL-bar-hidden height, so whenever the URL bar slides back in (i.e.
-     whenever you scroll up) the layout bottom is below the visible bottom and the
-     dock disappears off-screen. Lift it by exactly the hidden amount.
-     On iOS Safari the layout viewport is resized with the toolbars, so this
-     difference is ~0 and the lift stays inactive - no double-shift. */
+  /* ---- Dock positioning: deliberately NO JavaScript ----
+     There used to be a `--dock-lift` here that measured
+     `clientHeight - (visualViewport.height + offsetTop)` on every scroll frame
+     and pushed the dock up by that amount, on the theory that Chrome Android
+     leaves the layout viewport at its tall URL-bar-hidden size and strands a
+     bottom-fixed bar below the visible area.
+
+     That is no longer how Chrome behaves - it already anchors bottom-fixed
+     elements to the VISIBLE bottom while the URL bar animates. So the script was
+     double-correcting: the browser held the dock in place and the JS then lifted
+     it a further ~60px. Because the measurement re-ran on every scroll event and
+     `bottom` carried a .15s transition, the bar slid up and down continuously,
+     always lagging the scroll. That was the "dock is not fixed, it moves up and
+     down on mobile" bug - caused by the fix, not by the browser.
+
+     `position:fixed; bottom:calc(14px + env(safe-area-inset-bottom))` is correct
+     on its own in every current engine. Do not reintroduce a scroll listener
+     here; if a specific device really does strand the dock, confirm it with
+     #dockdebug first (it reports the exact hidden-below figure). */
   var vv = window.visualViewport;
-  if (vv) {
-    var root = document.documentElement;
-    var syncDock = function () {
-      // Pinch/page zoom shrinks vv.height in CSS px exactly the way a visible URL
-      // bar does, so the measurement below cannot tell them apart: at 2x zoom
-      // `hidden` reads ~half the layout height and the dock lifts hundreds of px
-      // to the middle of the screen. While the visitor is zoomed there is no URL
-      // bar to compensate for anyway — sit on the layout bottom and stay put.
-      if (vv.scale > 1.01) {
-        root.style.setProperty("--dock-lift", "0px");
-        return;
-      }
-      var hidden = root.clientHeight - (vv.height + vv.offsetTop);
-      var lift = Math.min(Math.max(hidden, 0), vv.height * 0.5);
-      root.style.setProperty("--dock-lift", (lift < 2 ? 0 : Math.round(lift)) + "px");
-    };
-    var queued = false;
-    var onViewportChange = function () {
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(function () { queued = false; syncDock(); });
-    };
-    vv.addEventListener("resize", onViewportChange);
-    vv.addEventListener("scroll", onViewportChange);
-    window.addEventListener("orientationchange", onViewportChange);
-    // Chrome slides the URL bar DURING a scroll and does not reliably fire
-    // visualViewport.resize until it settles, so re-measure on scroll as well.
-    window.addEventListener("scroll", onViewportChange, { passive: true });
-    syncDock();
-  }
 
   /* ---- Dock diagnostics: load the site with #dockdebug to enable ----
      Off for every normal visitor. Reports what the dock is ACTUALLY doing on a
