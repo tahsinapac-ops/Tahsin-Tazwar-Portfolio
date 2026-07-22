@@ -239,22 +239,27 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
      This is bulletproof in a way `width:min(...)` is not, because it never has
      to resolve a percentage against the initial containing block. */
   left:10px; right:10px; width:auto; max-width:var(--dock-w); margin-inline:auto;
-  /* --dock-lift (set by script.js) compensates for Chrome Android keeping the
-     layout viewport at its tall URL-bar-hidden size: while the URL bar is on
-     screen "the bottom" is below the visible area and the bar vanishes on
-     scroll-up. Required - see the note in script.js before touching it.
-     NEVER put a transition on `bottom`. The lift has to land in the same frame
-     it is measured; a transition makes the dock arrive late and it visibly
-     slides up and down chasing the scroll instead of sitting still. */
+  /* --dock-lift (set by script.js) closes the gap between the layout-viewport
+     bottom (where position:fixed lands) and the VISIBLE bottom - the gap that
+     opens when the URL bar is on screen on browsers that keep the layout
+     viewport tall. Required - see the note in script.js before touching it,
+     and see the transition note below: writes are debounced to gesture-end. */
   bottom:calc(14px + env(safe-area-inset-bottom) + var(--dock-lift, 0px));
-  /* --dock-x / --dock-s (set by script.js) glue the bar to the VISUAL viewport
-     while pinch-zoomed: counter-scaled by 1/zoom about the bottom-left corner
-     and slid to the visible left edge, the bar keeps a constant on-screen size
-     and position no matter how far the visitor zooms or pans — app behaviour.
-     At normal zoom both resolve to identity and this is just a translateZ(0)
-     compositor promotion. NEVER transition these or `bottom` (see below). */
+  /* --dock-x / --dock-s (set by script.js) glue the bar to the VISUAL viewport:
+     counter-scaled about the bottom-left corner and slid to the visible left
+     edge, the bar keeps a constant on-screen size and position whether the
+     visitor pinch-zooms, pans, or content overflow has widened the layout
+     viewport. At rest both resolve to identity and this is just a translateZ(0)
+     compositor promotion. */
   transform-origin:left bottom;
   transform:translate3d(var(--dock-x, 0px),0,0) scale(var(--dock-s, 1));
+  /* This transition is safe ONLY because script.js debounces its writes to the
+     END of a gesture: nothing is written while the finger is down or the URL
+     bar is animating, so the bar never chases the scroll - the transition just
+     smooths the single correction that lands after the viewport settles.
+     If writes ever go back to per-frame, REMOVE this or the bar will visibly
+     lag the scroll again (that exact bug has shipped twice from here). */
+  transition:bottom .18s ease-out, transform .18s ease-out;
   /* Flex, not grid. Grid `fr` tracks are floored at their item's min-content
      width, so the tracks refused to shrink, the row overflowed to the right and
      the Menu button ended up off-screen (measured: content 479px in a 465px box).
@@ -357,6 +362,15 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   .hero-copy { order:2; }
   .hero-photo-wrap { order:1; }
   .hero-photo { max-width:230px; }
+  /* CRITICAL: shrink-wrap the photo wrapper on mobile. It used to span the full
+     grid column while the photo was capped at 230px, so .ring-1 (width:108% OF
+     THE WRAPPER) grew to ~446px on a 390px phone. Android then EXPANDS the
+     layout viewport to fit the overflow (measured: 417px layout on a 390px
+     screen) - body's overflow-x:clip hides the scrollbar but does NOT stop the
+     expansion. Every position:fixed element anchors to that wider viewport, so
+     the dock hung 27px off-screen and the page could pan sideways "by itself".
+     With fit-content the ring is 108% of the photo, not the column. */
+  .hero-photo-wrap { width:fit-content; margin-inline:auto; }
   .eyebrow, .hero-actions, .socials { justify-content:center; }
   .hero-lead { margin-inline:auto; }
   .globe-stage { max-width:440px; }
@@ -485,6 +499,8 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   .reveal { opacity:1; transform:none; transition:none; }
   .hero-photo, .ring, .orb { animation:none; }
   .dock, .dock::before, .dock-center::before { animation:none; }
+  /* Settle corrections snap instantly instead of easing. */
+  .dock { transition:none; }
   /* Same reason as the touch block: a frozen --ang leaves the pill's conic arc
      stuck in the top-right corner. Reduced motion means no animation, not a
      half-drawn border. */
