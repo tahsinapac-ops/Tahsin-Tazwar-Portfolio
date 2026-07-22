@@ -156,18 +156,27 @@
   if (vv) {
     var root = document.documentElement;
     var syncDock = function () {
-      // Pinch/page zoom shrinks vv.height in CSS px exactly the way a visible URL
-      // bar does, so the measurement below cannot tell them apart: at 2x zoom
-      // `hidden` reads ~half the layout height and the dock would lift hundreds
-      // of px to the middle of the screen. While zoomed there is no URL bar to
-      // compensate for anyway - sit on the layout bottom and stay put.
-      if (vv.scale > 1.01) {
-        root.style.setProperty("--dock-lift", "0px");
-        return;
-      }
+      // ONE formula for every state - URL bar sliding, pinch-zoomed, panned, or
+      // all three at once: `hidden` is the layout-px gap between the layout
+      // bottom (where position:fixed lands) and the VISIBLE bottom. Lifting by
+      // exactly that gap glues the bar's bottom edge to the visible bottom.
+      // It is 0 when nothing is hidden, and while zoomed it is naturally
+      // bounded by (clientHeight - vv.height), so no extra clamp is needed.
+      // The old `if (scale > 1.01) lift = 0` bail was WRONG: it parked the bar
+      // at the layout bottom, which while zoomed sits below the visible area -
+      // that was the "bar is not there, appears after scrolling" report.
       var hidden = root.clientHeight - (vv.height + vv.offsetTop);
-      var lift = Math.min(Math.max(hidden, 0), vv.height * 0.5);
+      var lift = Math.max(hidden, 0);
       root.style.setProperty("--dock-lift", (lift < 2 ? 0 : Math.round(lift)) + "px");
+      // Horizontal + size glue while pinch-zoomed. The bar is layout-anchored
+      // (left:0/right:0 = layout width), so at 2x zoom it renders twice as wide
+      // as the screen and pans out of view sideways - the "bar goes right by
+      // itself" report. Counter-scale by 1/zoom about the bottom-left corner
+      // (transform-origin in the CSS) and slide to the visual left edge: the
+      // bar then keeps a constant on-screen size and position at any zoom.
+      var zoomed = vv.scale > 1.01;
+      root.style.setProperty("--dock-x", zoomed ? Math.round(Math.max(vv.offsetLeft, 0)) + "px" : "0px");
+      root.style.setProperty("--dock-s", zoomed ? String(1 / vv.scale) : "1");
     };
     var queued = false;
     var onViewportChange = function () {

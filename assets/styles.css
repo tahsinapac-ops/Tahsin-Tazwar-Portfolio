@@ -55,7 +55,11 @@
    container on mobile, which breaks position:fixed (the dock stops sticking).
    It stays on <body> rather than <html>: on the root element the clip applies to
    the viewport itself, which puts a clipping box above the fixed dock. */
-html { scroll-behavior:smooth; scroll-padding-top:24px; }
+/* touch-action:manipulation removes DOUBLE-TAP zoom (the "page suddenly zoomed
+   and slid sideways" accident when tapping fast while scrolling) but keeps
+   pinch zoom, so low-vision visitors are not locked out the way
+   user-scalable=no would. */
+html { scroll-behavior:smooth; scroll-padding-top:24px; touch-action:manipulation; }
 body { font-family:var(--font-body); background:var(--bg); color:var(--text); line-height:1.6;
   -webkit-font-smoothing:antialiased; overflow-x:clip; transition:background .3s ease, color .3s ease; }
 .container { width:100%; max-width:var(--maxw); margin:0 auto; padding:0 22px; }
@@ -243,7 +247,14 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
      it is measured; a transition makes the dock arrive late and it visibly
      slides up and down chasing the scroll instead of sitting still. */
   bottom:calc(14px + env(safe-area-inset-bottom) + var(--dock-lift, 0px));
-  transform:translateZ(0);
+  /* --dock-x / --dock-s (set by script.js) glue the bar to the VISUAL viewport
+     while pinch-zoomed: counter-scaled by 1/zoom about the bottom-left corner
+     and slid to the visible left edge, the bar keeps a constant on-screen size
+     and position no matter how far the visitor zooms or pans — app behaviour.
+     At normal zoom both resolve to identity and this is just a translateZ(0)
+     compositor promotion. NEVER transition these or `bottom` (see below). */
+  transform-origin:left bottom;
+  transform:translate3d(var(--dock-x, 0px),0,0) scale(var(--dock-s, 1));
   /* Flex, not grid. Grid `fr` tracks are floored at their item's min-content
      width, so the tracks refused to shrink, the row overflowed to the right and
      the Menu button ended up off-screen (measured: content 479px in a 465px box).
@@ -254,10 +265,14 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   background:var(--menu-bg); backdrop-filter:blur(20px) saturate(1.3);
   border:1px solid var(--border);
   will-change:transform; backface-visibility:hidden;
-  animation:dockIn .55s cubic-bezier(.2,.8,.2,1) both, dockGlow 4.5s ease-in-out infinite .6s; }
+  /* fill-mode BACKWARDS, never `both`/`forwards`: a forwards fill would freeze
+     the keyframe's transform over the base rule for the life of the page and
+     the --dock-x/--dock-s viewport glue above would silently stop working. */
+  animation:dockIn .55s cubic-bezier(.2,.8,.2,1) backwards, dockGlow 4.5s ease-in-out infinite .6s; }
+/* No `to` frame: the entrance interpolates to the element's live computed
+   transform, i.e. straight into the var-driven glue state. */
 @keyframes dockIn {
-  from { opacity:0; transform:translate3d(0,26px,0); }
-  to   { opacity:1; transform:translateZ(0); }
+  from { opacity:0; transform:translate3d(var(--dock-x, 0px),26px,0) scale(var(--dock-s, 1)); }
 }
 
 /* Continuous running light around the dock.
@@ -458,8 +473,10 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
     background:linear-gradient(90deg, var(--accent), var(--pink) 50%, var(--cyan));
     animation:none; opacity:1; }
   /* Static upward shadow instead of the pulsing dockGlow, so the layer never
-     needs repainting once the entrance animation has finished. */
-  .dock { animation:dockIn .55s cubic-bezier(.2,.8,.2,1) both;
+     needs repainting once the entrance animation has finished. fill-mode stays
+     BACKWARDS for the same reason as the base rule: a forwards fill would
+     freeze out the --dock-x/--dock-s viewport glue. */
+  .dock { animation:dockIn .55s cubic-bezier(.2,.8,.2,1) backwards;
     box-shadow:0 -10px 32px -14px rgba(0,0,0,0.5); }
 }
 
