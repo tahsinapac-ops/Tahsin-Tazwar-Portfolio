@@ -96,14 +96,6 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
 .btn-ghost { color:var(--text); background:var(--surface); border-color:var(--border); }
 .btn-ghost:hover { background:var(--surface-2); border-color:var(--edge); }
 
-/* Socials */
-.socials { display:flex; gap:10px; margin-top:26px; }
-.socials a { width:42px; height:42px; border-radius:var(--radius-btn); display:grid; place-items:center;
-  background:var(--surface); border:1px solid var(--border); color:var(--muted); transition:.2s; }
-.socials a:hover { color:var(--on-accent); background:var(--grad); border-color:transparent; transform:translateY(-3px); box-shadow:0 10px 24px -8px var(--accent-glow); }
-.socials a svg { width:19px; height:19px; }
-.socials-lg { justify-content:center; margin-top:24px; }
-
 /* Hero */
 .hero { position:relative; padding:clamp(52px,9vh,110px) 0 68px; }
 .hero-grid { position:relative; z-index:1; display:grid; grid-template-columns:1.1fr 0.9fr; gap:52px; align-items:center; }
@@ -446,7 +438,7 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
      the dock hung 27px off-screen and the page could pan sideways "by itself".
      With fit-content the ring is 108% of the photo, not the column. */
   .hero-photo-wrap { width:fit-content; margin-inline:auto; }
-  .eyebrow, .hero-actions, .socials { justify-content:center; }
+  .eyebrow, .hero-actions { justify-content:center; }
   .hero-lead { margin-inline:auto; }
   .globe-stage { max-width:440px; }
   .do-cards { grid-template-columns:1fr; }
@@ -595,5 +587,5 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
      stuck in the top-right corner. Reduced motion means no animation, not a
      half-drawn border. */
   .dock::before { background:linear-gradient(100deg, var(--accent) 0%, var(--pink) 40%, var(--cyan) 75%, var(--accent) 100%); }
-  .btn:hover, .do-card:hover, .role-card:hover, .chips li:hover, .socials a:hover, .dock-item:hover { transform:none; }
+  .btn:hover, .do-card:hover, .role-card:hover, .chips li:hover, .footer-social a:hover, .dock-item:hover { transform:none; }
 }
