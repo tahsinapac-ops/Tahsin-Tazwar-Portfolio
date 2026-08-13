@@ -45,26 +45,27 @@
     .atmosphereColor("#ccff00")
     .atmosphereAltitude(0.17)
 
-    // Bangladesh marker
+    // Bangladesh marker — the whole point of the visual, so it is deliberately
+    // oversized and lime rather than a to-scale dot lost in the Bay of Bengal.
     .pointsData([{ lat: DHAKA.lat, lng: DHAKA.lng }])
-    .pointColor(function () { return "#ff8a2b"; })
-    .pointAltitude(0.035)
-    .pointRadius(0.62)
+    .pointColor(function () { return "#ccff00"; })
+    .pointAltitude(0.06)
+    .pointRadius(0.95)
 
     // Pulsing ring over Bangladesh
     .ringsData(reduce ? [] : [{ lat: DHAKA.lat, lng: DHAKA.lng }])
-    .ringColor(function () { return function (t) { return "rgba(255,138,43," + (1 - t) + ")"; }; })
-    .ringMaxRadius(7)
+    .ringColor(function () { return function (t) { return "rgba(204,255,0," + (1 - t) + ")"; }; })
+    .ringMaxRadius(9)
     .ringPropagationSpeed(2.2)
     .ringRepeatPeriod(1100)
 
     // Label
     .labelsData([{ lat: DHAKA.lat, lng: DHAKA.lng, text: "Bangladesh" }])
     .labelText("text")
-    .labelSize(1.5)
-    .labelDotRadius(0.45)
-    .labelColor(function () { return "#ffc48a"; })
-    .labelAltitude(0.04)
+    .labelSize(2.4)
+    .labelDotRadius(0.55)
+    .labelColor(function () { return "#ccff00"; })
+    .labelAltitude(0.07)
 
     // Connections out to the world
     .arcsData(arcs)
@@ -80,17 +81,40 @@
 
   var controls = globe.controls();
   controls.enableZoom = false;          // don't hijack page scroll
-  controls.autoRotate = !reduce;
-  controls.autoRotateSpeed = 0.55;
   controls.rotateSpeed = 0.8;
-  // On touch devices let one finger scroll the page; the globe still auto-rotates.
-  if (controls.touches) controls.touches.ONE = null;
+  // autoRotate is OFF on purpose. A continuous spin carries Bangladesh around
+  // the far side for half of every revolution, which defeats the point of the
+  // section. The sway below keeps it on screen at all times instead.
+  controls.autoRotate = false;
 
-  // Pause auto-rotation while the visitor is dragging
-  el.addEventListener("pointerdown", function () { controls.autoRotate = false; });
-  window.addEventListener("pointerup", function () {
-    if (!reduce) setTimeout(function () { controls.autoRotate = true; }, 2500);
-  });
+  // Touch devices never drive the globe: OrbitControls swallowing a drag is
+  // what made the section feel like a scroll trap on phones. CSS also sets
+  // pointer-events:none there; this is the belt to that braces.
+  var touch = window.matchMedia("(hover:none) and (pointer:coarse)").matches;
+  if (touch) {
+    controls.enabled = false;
+  } else if (controls.touches) {
+    controls.touches.ONE = null;
+  }
+
+  /* Gentle sway around Bangladesh instead of a full spin: the camera arcs a
+     little either side of Dhaka, so the marker is always in view but the globe
+     still reads as alive. Handing off to the visitor is one-way — once someone
+     drags, the sway stops for good rather than fighting them for the camera. */
+  var swayed = 0, swaying = !reduce;
+  function sway() {
+    if (!swaying) return;
+    swayed += 0.0022;
+    globe.pointOfView({
+      lat: DHAKA.lat - 4,
+      lng: DHAKA.lng + Math.sin(swayed) * 26,
+      altitude: 2.3
+    }, 0);
+    requestAnimationFrame(sway);
+  }
+  if (swaying) requestAnimationFrame(sway);
+
+  el.addEventListener("pointerdown", function () { swaying = false; });
 
   // Responsive sizing
   function size() {

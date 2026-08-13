@@ -290,4 +290,96 @@
       try { localStorage.setItem("theme", next); } catch (e) {}
     });
   }
+
+  /* ---- Cursor burn: a lime trail that follows the mouse ----
+     Canvas, not a stack of DOM nodes: the trail is redrawn every frame and
+     compositing ~40 blurred divs per frame is what makes these effects janky.
+
+     Mouse only. A finger has no hover position, so on touch the trail would
+     either sit frozen where the last tap landed or streak across the screen on
+     every scroll. matchMedia is the gate rather than a UA sniff, and the
+     pointermove handler re-checks pointerType so a stylus or a hybrid laptop
+     with both inputs behaves. */
+  if (!reduceMotion && window.matchMedia("(hover:hover) and (pointer:fine)").matches) {
+    (function () {
+      var canvas = document.createElement("canvas");
+      canvas.className = "cursor-burn";
+      canvas.setAttribute("aria-hidden", "true");
+      document.body.appendChild(canvas);
+      var ctx = canvas.getContext("2d");
+
+      // Cap the backing store at 2x. On a 4K screen the untruncated dpr makes
+      // this a 30MP surface to clear and blur every frame for no visible gain.
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      function resize() {
+        canvas.width = Math.round(window.innerWidth * dpr);
+        canvas.height = Math.round(window.innerHeight * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      var pts = [];        // recent pointer positions, newest last
+      var MAX = 18;        // trail length; beyond ~20 the tail is invisible anyway
+      var running = false;
+
+      window.addEventListener("pointermove", function (e) {
+        if (e.pointerType && e.pointerType !== "mouse") return;
+        pts.push({ x: e.clientX, y: e.clientY });
+        if (pts.length > MAX) pts.shift();
+        if (!running) { running = true; requestAnimationFrame(draw); }
+      }, { passive: true });
+
+      function draw() {
+        // Fade what is already on the canvas instead of clearing it, so each
+        // frame leaves a slightly dimmer ghost of the last — that decay IS the
+        // burn. destination-out subtracts alpha, which fades to transparent
+        // rather than to black the way a translucent fillRect would.
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.fillStyle = "rgba(0,0,0,0.14)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.globalCompositeOperation = "lighter";
+
+        for (var i = 1; i < pts.length; i++) {
+          var t = i / pts.length;                 // 0 = tail, 1 = cursor
+          ctx.beginPath();
+          ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
+          ctx.lineTo(pts[i].x, pts[i].y);
+          ctx.strokeStyle = "rgba(204,255,0," + (0.5 * t) + ")";
+          ctx.lineWidth = 1 + 7 * t;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.shadowColor = "rgba(204,255,0,0.85)";
+          ctx.shadowBlur = 16 * t;
+          ctx.stroke();
+        }
+
+        // Hot core at the cursor itself — white-hot centre bleeding to lime.
+        if (pts.length) {
+          var head = pts[pts.length - 1];
+          var g = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 26);
+          g.addColorStop(0, "rgba(233,255,160,0.5)");
+          g.addColorStop(0.35, "rgba(204,255,0,0.26)");
+          g.addColorStop(1, "rgba(204,255,0,0)");
+          ctx.fillStyle = g;
+          ctx.shadowBlur = 0;
+          ctx.beginPath();
+          ctx.arc(head.x, head.y, 26, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Retire the oldest point every frame so a parked cursor burns out and
+        // the rAF loop can stop, instead of spinning forever on a still image.
+        if (pts.length) pts.shift();
+        if (pts.length) {
+          requestAnimationFrame(draw);
+        } else {
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          running = false;
+        }
+      }
+    })();
+  }
 })();
