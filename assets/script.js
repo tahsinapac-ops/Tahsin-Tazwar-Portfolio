@@ -137,31 +137,68 @@
   /* ---- Keep the dock above the browser UI ----
      position:fixed anchors to the LAYOUT viewport. Chrome Android holds that at
      its full URL-bar-hidden height, so whenever the URL bar slides back in (i.e.
-     whenever you scroll up) the layout bottom is below the visible bottom and the
-     dock disappears off-screen. Lift it by exactly the hidden amount.
-     On iOS Safari the layout viewport is resized with the toolbars, so this
-     difference is ~0 and the lift stays inactive - no double-shift. */
+     whenever you scroll UP) the layout bottom sits below the visible bottom and
+     the dock goes off-screen. Lift it by exactly the hidden amount.
+     On iOS Safari the layout viewport resizes with the toolbars, so the
+     difference is ~0 and the lift stays inactive - no double-shift.
+
+     This compensation was briefly deleted on the theory that Chrome now anchors
+     bottom-fixed elements to the visible viewport by itself. It does not: the
+     dock vanished on scroll-up. It is REQUIRED. Do not remove it again.
+
+     What was actually wrong was never the measurement - it was the `.15s`
+     transition on `bottom` in the CSS. The lift has to track the URL bar frame
+     by frame; putting a transition on it made the dock arrive 150ms late every
+     time, so instead of sitting glued to the screen edge it visibly slid up and
+     down chasing the scroll. The transition is gone and must stay gone: with an
+     instant write per frame the bar reads as motionless. */
   var vv = window.visualViewport;
   if (vv) {
     var root = document.documentElement;
-    var syncDock = function () {
-      var hidden = root.clientHeight - (vv.height + vv.offsetTop);
-      var lift = Math.min(Math.max(hidden, 0), vv.height * 0.5);
+    var dockEl = document.querySelector(".dock");
+    var applyDock = function () {
+      // ANCHOR MATHS - measured, not assumed (headless-Chrome harness):
+      // position:fixed resolves against the LAYOUT viewport, i.e.
+      // window.innerHeight/innerWidth - NOT documentElement.clientHeight.
+      // The two differ whenever the URL bar is mid-state, or when content
+      // overflow has expanded the layout viewport (417px layout on a 390px
+      // phone was measured on this very page before the ring fix). Using
+      // clientHeight here put the bar 63px off in the harness.
+      // lift = the layout-px gap between the layout bottom and the VISIBLE
+      // bottom; exact in every state (URL bar, zoom, pan) and self-bounded.
+      var lift = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
       root.style.setProperty("--dock-lift", (lift < 2 ? 0 : Math.round(lift)) + "px");
+      // Horizontal + size glue, ALWAYS on (not only while zoomed):
+      // s = visualWidth / barLayoutWidth handles pinch zoom AND layout-viewport
+      // expansion with one expression, and is capped at 1 so the narrower
+      // desktop pill is never enlarged. x pins the bar to the visible left
+      // edge whenever the visual viewport is panned within the layout one.
+      var x = Math.max(0, vv.offsetLeft);
+      var s = 1;
+      if (dockEl && dockEl.offsetWidth > 0) s = Math.min(1, vv.width / dockEl.offsetWidth);
+      root.style.setProperty("--dock-x", (x < 1 ? 0 : Math.round(x)) + "px");
+      root.style.setProperty("--dock-s", s > 0.999 ? "1" : s.toFixed(4));
     };
-    var queued = false;
+    // DEBOUNCE - the fix for "the bar moves by itself while scrolling".
+    // Writing per event chases the URL-bar animation a frame late, so the bar
+    // visibly wobbles on every scroll. Instead: write NOTHING while viewport
+    // events are streaming, then apply once ~100ms after they stop. Browsers
+    // that natively glue fixed elements during the animation need no help
+    // (settled lift is 0, so the bar never moves at all); browsers that strand
+    // the bar get one clean correction, smoothed by the CSS transition.
+    // That transition is ONLY safe under this debounce - see styles.css.
+    var settle = null;
     var onViewportChange = function () {
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(function () { queued = false; syncDock(); });
+      if (settle) clearTimeout(settle);
+      settle = setTimeout(applyDock, 100);
     };
     vv.addEventListener("resize", onViewportChange);
     vv.addEventListener("scroll", onViewportChange);
     window.addEventListener("orientationchange", onViewportChange);
-    // Chrome slides the URL bar DURING a scroll and does not reliably fire
-    // visualViewport.resize until it settles, so re-measure on scroll as well.
+    // Some browsers never fire visualViewport events for the URL bar itself,
+    // so the window scroll stream (debounced, above) is the backstop signal.
     window.addEventListener("scroll", onViewportChange, { passive: true });
-    syncDock();
+    applyDock();
   }
 
   /* ---- Dock diagnostics: load the site with #dockdebug to enable ----

@@ -60,7 +60,11 @@
    container on mobile, which breaks position:fixed (the dock stops sticking).
    It stays on <body> rather than <html>: on the root element the clip applies to
    the viewport itself, which puts a clipping box above the fixed dock. */
-html { scroll-behavior:smooth; scroll-padding-top:24px; }
+/* touch-action:manipulation removes DOUBLE-TAP zoom (the "page suddenly zoomed
+   and slid sideways" accident when tapping fast while scrolling) but keeps
+   pinch zoom, so low-vision visitors are not locked out the way
+   user-scalable=no would. */
+html { scroll-behavior:smooth; scroll-padding-top:24px; touch-action:manipulation; }
 body { font-family:var(--font-body); background:var(--bg); color:var(--text); line-height:1.6;
   -webkit-font-smoothing:antialiased; overflow-x:clip; transition:background .3s ease, color .3s ease; }
 .container { width:100%; max-width:var(--maxw); margin:0 auto; padding:0 22px; }
@@ -240,12 +244,27 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
      This is bulletproof in a way `width:min(...)` is not, because it never has
      to resolve a percentage against the initial containing block. */
   left:10px; right:10px; width:auto; max-width:var(--dock-w); margin-inline:auto;
-  /* --dock-lift (set by script.js) compensates for Chrome Android keeping the
-     layout viewport at its tall URL-bar-hidden size: while the URL bar is on
-     screen, "the bottom" is below the visible area and the bar vanishes. */
+  /* --dock-lift (set by script.js) closes the gap between the layout-viewport
+     bottom (where position:fixed lands) and the VISIBLE bottom - the gap that
+     opens when the URL bar is on screen on browsers that keep the layout
+     viewport tall. Required - see the note in script.js before touching it,
+     and see the transition note below: writes are debounced to gesture-end. */
   bottom:calc(14px + env(safe-area-inset-bottom) + var(--dock-lift, 0px));
-  transition:bottom .15s linear;
-  transform:translateZ(0);
+  /* --dock-x / --dock-s (set by script.js) glue the bar to the VISUAL viewport:
+     counter-scaled about the bottom-left corner and slid to the visible left
+     edge, the bar keeps a constant on-screen size and position whether the
+     visitor pinch-zooms, pans, or content overflow has widened the layout
+     viewport. At rest both resolve to identity and this is just a translateZ(0)
+     compositor promotion. */
+  transform-origin:left bottom;
+  transform:translate3d(var(--dock-x, 0px),0,0) scale(var(--dock-s, 1));
+  /* This transition is safe ONLY because script.js debounces its writes to the
+     END of a gesture: nothing is written while the finger is down or the URL
+     bar is animating, so the bar never chases the scroll - the transition just
+     smooths the single correction that lands after the viewport settles.
+     If writes ever go back to per-frame, REMOVE this or the bar will visibly
+     lag the scroll again (that exact bug has shipped twice from here). */
+  transition:bottom .18s ease-out, transform .18s ease-out;
   /* Flex, not grid. Grid `fr` tracks are floored at their item's min-content
      width, so the tracks refused to shrink, the row overflowed to the right and
      the Menu button ended up off-screen (measured: content 479px in a 465px box).
@@ -256,19 +275,44 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   background:var(--menu-bg); backdrop-filter:blur(20px) saturate(1.3);
   border:1px solid var(--border);
   will-change:transform; backface-visibility:hidden;
-  animation:dockIn .55s cubic-bezier(.2,.8,.2,1) both, dockGlow 4.5s ease-in-out infinite .6s; }
+  /* fill-mode BACKWARDS, never `both`/`forwards`: a forwards fill would freeze
+     the keyframe's transform over the base rule for the life of the page and
+     the --dock-x/--dock-s viewport glue above would silently stop working. */
+  animation:dockIn .55s cubic-bezier(.2,.8,.2,1) backwards, dockGlow 4.5s ease-in-out infinite .6s; }
+/* No `to` frame: the entrance interpolates to the element's live computed
+   transform, i.e. straight into the var-driven glue state. */
 @keyframes dockIn {
-  from { opacity:0; transform:translate3d(0,26px,0); }
-  to   { opacity:1; transform:translateZ(0); }
+  from { opacity:0; transform:translate3d(var(--dock-x, 0px),26px,0) scale(var(--dock-s, 1)); }
 }
 
-/* continuous running light around the dock */
-.dock::before { content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1.8px; pointer-events:none;
-  background:conic-gradient(from var(--ang),
-     transparent 0deg, var(--accent) 26deg, var(--pink) 52deg, var(--cyan) 78deg, transparent 118deg, transparent 360deg);
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude;
-  animation:runLight 4.5s linear infinite; }
+/* Continuous running light around the dock.
+   The masked-gradient border trick DEPENDS on mask compositing: the mask is two
+   stacked layers (content-box + border-box) and only the xor/exclude composite
+   punches the middle out to leave a ring. Where that composite is unsupported
+   the mask degrades to "show everything" and the conic gradient FILLS the pill —
+   a solid blob painted over the icons, and on the centre button a disc over the
+   "T". So both are off by default and only switched on behind @supports; every
+   other engine keeps the plain 1px border, which looks intentional. */
+.dock::before, .dock-center::before { display:none; }
+
+@supports ((mask-composite:exclude) or (-webkit-mask-composite:xor)) {
+  .dock::before { display:block; content:""; position:absolute; inset:-1px; border-radius:inherit; padding:1.8px; pointer-events:none;
+    background:conic-gradient(from var(--ang),
+       transparent 0deg, var(--accent) 26deg, var(--pink) 52deg, var(--cyan) 78deg, transparent 118deg, transparent 360deg);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:runLight 4.5s linear infinite; }
+
+  /* Centre button ring. Unlike the pill above this is a full 360° sweep with no
+     transparent stop, so it still reads correctly when frozen. */
+  .dock-center::before { display:block; content:""; position:absolute; inset:-6px; border-radius:50%; padding:2.5px; pointer-events:none;
+    background:conic-gradient(from var(--ang), var(--accent), var(--pink), var(--cyan), var(--accent));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:runLight 3.5s linear infinite; }
+}
 @keyframes runLight { to { --ang:360deg; } }
 @keyframes dockGlow {
   0%,100% { box-shadow:0 18px 44px -14px rgba(0,0,0,0.6), 0 0 20px -8px var(--accent-glow); }
@@ -293,11 +337,8 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   background:var(--grad); color:var(--on-accent); border:4px solid var(--bg);
   box-shadow:0 14px 34px -8px var(--accent-glow); transition:transform .2s; }
 .dock-center span { font-family:var(--font-logo); font-weight:900; font-size:27px; line-height:1; }
-.dock-center::before { content:""; position:absolute; inset:-6px; border-radius:50%; padding:2.5px; pointer-events:none;
-  background:conic-gradient(from var(--ang), var(--accent), var(--pink), var(--cyan), var(--accent));
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude;
-  animation:runLight 3.5s linear infinite; }
+/* .dock-center::before (the gradient ring) lives in the @supports block above,
+   next to .dock::before — both need the same mask-compositing guard. */
 .dock-center:hover { transform:translateY(-3px) scale(1.04); }
 .dock-center:active { transform:scale(0.95); }
 
@@ -326,6 +367,15 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   .hero-copy { order:2; }
   .hero-photo-wrap { order:1; }
   .hero-photo { max-width:230px; }
+  /* CRITICAL: shrink-wrap the photo wrapper on mobile. It used to span the full
+     grid column while the photo was capped at 230px, so .ring-1 (width:108% OF
+     THE WRAPPER) grew to ~446px on a 390px phone. Android then EXPANDS the
+     layout viewport to fit the overflow (measured: 417px layout on a 390px
+     screen) - body's overflow-x:clip hides the scrollbar but does NOT stop the
+     expansion. Every position:fixed element anchors to that wider viewport, so
+     the dock hung 27px off-screen and the page could pan sideways "by itself".
+     With fit-content the ring is 108% of the photo, not the column. */
+  .hero-photo-wrap { width:fit-content; margin-inline:auto; }
   .eyebrow, .hero-actions, .socials { justify-content:center; }
   .hero-lead { margin-inline:auto; }
   .globe-stage { max-width:440px; }
@@ -342,26 +392,43 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
 /* Phones: icon-only dock so it can never overflow the screen.
    Same 560px breakpoint as the rest of the phone rules below — a mismatched
    threshold left 521-560px wide devices showing labels in a cramped bar. */
+/* Phones / narrow windows: APP-STYLE BOTTOM BAR, not a floating pill.
+   Edge-to-edge and anchored to the very bottom like a native tab bar.
+   Full-bleed left/right means there is no centring math left to go wrong: the
+   bar cannot be off-centre, cannot be clipped at one edge, cannot overflow.
+   The safe-area inset moves INTO padding-bottom so the bar's background extends
+   under the home indicator while the icons sit above it — the native-app look. */
 @media (max-width:560px) {
-  /* Cap the pill instead of letting it stretch to (viewport - 20px). On a 412px
-     Android that was a 392px bar holding four 22px icons — mostly empty space.
-     344px keeps the icons in a tight cluster with a real margin either side, and
-     still shrinks to fit 320px phones because left/right:10px wins over max-width. */
-  :root { --dock-w:344px; }
-  .dock { padding:9px 6px; gap:0; border-radius:20px;
-    bottom:calc(12px + env(safe-area-inset-bottom)); }
+  /* var(--dock-lift) MUST be carried by every `bottom` override. Omitting it
+     here silently cancelled the URL-bar compensation on exactly the devices that
+     need it — the dock vanished on scroll-up on every phone under 560px while
+     the base rule above looked correct. */
+  .dock { left:0; right:0; max-width:none; margin:0;
+    bottom:var(--dock-lift, 0px);
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    gap:0; border:0; border-radius:0; }
   .dock-item span { display:none; }
   .dock-item { padding:2px 0; }
   .dock-item svg { width:22px; height:22px; }
   .dock-center { width:52px; height:52px; margin:-26px 4px 0; border-width:3px; }
   .dock-center span { display:block; font-size:22px; }
-  .dock-menu { min-width:200px; right:2px; max-width:calc(100vw - 24px); }
+  .dock-menu { min-width:200px; right:10px; max-width:calc(100vw - 24px); }
+  /* Brand hairline along the bar's top edge replaces the pill's gradient ring.
+     A plain 2px gradient strip needs no mask, so it is safe on every engine —
+     display:block here deliberately overrides the @supports-guarded ring above
+     (equal specificity, later in the file wins). */
+  .dock::before { content:""; display:block; position:absolute; pointer-events:none;
+    inset:auto; top:0; left:0; right:0; height:2px;
+    padding:0; border-radius:0; -webkit-mask:none; mask:none;
+    background:linear-gradient(90deg, var(--accent), var(--pink) 50%, var(--cyan));
+    animation:none; opacity:1; }
 }
 
 /* Landscape phones: short viewports need a slimmer bar and less footer padding */
 @media (max-height:480px) and (orientation:landscape) {
   :root { --dock-clear:120px; }
-  .dock { padding:8px; bottom:calc(8px + env(safe-area-inset-bottom)); }
+  /* Carries var(--dock-lift) for the same reason as the phone block above. */
+  .dock { padding:8px; bottom:calc(8px + env(safe-area-inset-bottom) + var(--dock-lift, 0px)); }
   .dock-center { width:48px; height:48px; margin:-24px 6px 0; }
   .dock-center span { font-size:21px; }
   .dock-item svg { width:20px; height:20px; }
@@ -392,31 +459,44 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
    Dropping to an opaque background removes the readback and costs nothing
    visually: --menu-bg was already 92% opaque. */
 @media (hover:none) and (pointer:coarse) {
-  /* Width is keyed on TOUCH, not on a pixel breakpoint, so it can never disagree
-     with the icon-only rule below. Previously a 561-900px touch device (foldable,
-     tablet, phone in landscape) took --dock-w:560px from the width query while
-     this block stripped its labels: a 560px bar holding four 20px icons.
-     One compact pill on every touch device instead. */
-  :root { --dock-w:344px; --dock-clear:128px; }
+  /* Keyed on TOUCH, not on a pixel breakpoint, so a 561-900px touch device
+     (foldable, tablet, phone in landscape) gets exactly the same app bar as a
+     390px phone — no width threshold to disagree with. */
+  :root { --dock-clear:128px; }
+  /* Same app-bar geometry as the narrow-width block above; duplicated because a
+     wide touch device matches only this query. `bottom` keeps var(--dock-lift). */
+  .dock { left:0; right:0; max-width:none; margin:0;
+    bottom:var(--dock-lift, 0px);
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    gap:0; border:0; border-radius:0; }
   .dock-item svg { width:22px; height:22px; }
+  /* Opaque background: a live backdrop blur on a fixed bar forces Chrome Android
+     to re-rasterise every frame and the bar blinks out mid-scroll on weak GPUs.
+     --menu-bg was already 92% opaque; solid costs nothing visually. */
   .dock, .dock-menu {
     background:var(--menu-solid);
     -webkit-backdrop-filter:none; backdrop-filter:none;
   }
   /* Icon-only on EVERY touch device, not just under a width threshold.
-     Text labels are what make a track demand horizontal space; drop them and
-     five columns cannot overflow no matter what the viewport reports. */
+     Text labels are what make an item demand horizontal space; drop them and
+     five items cannot overflow no matter what the viewport reports. */
   .dock-item span { display:none; }
   .dock-item { padding:2px 0; min-width:0; }
   .dock-item svg { flex:none; }
-  .dock-menu { max-width:calc(100vw - 24px); }
-  /* The masked conic-gradient border is the other per-frame GPU cost on that
-     same layer — freeze it. The centre button keeps its running light. */
-  .dock::before { animation:none; opacity:0.6; }
-  /* Static shadow instead of the pulsing dockGlow, so the layer never needs
-     repainting once the entrance animation has finished. */
-  .dock { animation:dockIn .55s cubic-bezier(.2,.8,.2,1) both;
-    box-shadow:0 18px 44px -14px rgba(0,0,0,0.55), 0 0 26px -6px var(--accent-glow); }
+  .dock-menu { min-width:200px; right:10px; max-width:calc(100vw - 24px); }
+  /* Top hairline instead of the masked conic ring: no mask, no per-frame GPU
+     cost, no frozen-arc artefact — safe on every engine. */
+  .dock::before { content:""; display:block; position:absolute; pointer-events:none;
+    inset:auto; top:0; left:0; right:0; height:2px;
+    padding:0; border-radius:0; -webkit-mask:none; mask:none;
+    background:linear-gradient(90deg, var(--accent), var(--pink) 50%, var(--cyan));
+    animation:none; opacity:1; }
+  /* Static upward shadow instead of the pulsing dockGlow, so the layer never
+     needs repainting once the entrance animation has finished. fill-mode stays
+     BACKWARDS for the same reason as the base rule: a forwards fill would
+     freeze out the --dock-x/--dock-s viewport glue. */
+  .dock { animation:dockIn .55s cubic-bezier(.2,.8,.2,1) backwards;
+    box-shadow:0 -10px 32px -14px rgba(0,0,0,0.5); }
 }
 
 @media (prefers-reduced-motion:reduce) {
@@ -424,5 +504,11 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
   .reveal { opacity:1; transform:none; transition:none; }
   .hero-photo, .ring, .orb { animation:none; }
   .dock, .dock::before, .dock-center::before { animation:none; }
+  /* Settle corrections snap instantly instead of easing. */
+  .dock { transition:none; }
+  /* Same reason as the touch block: a frozen --ang leaves the pill's conic arc
+     stuck in the top-right corner. Reduced motion means no animation, not a
+     half-drawn border. */
+  .dock::before { background:linear-gradient(100deg, var(--accent) 0%, var(--pink) 40%, var(--cyan) 75%, var(--accent) 100%); }
   .btn:hover, .do-card:hover, .role-card:hover, .chips li:hover, .socials a:hover, .dock-item:hover { transform:none; }
 }
