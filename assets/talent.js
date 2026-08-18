@@ -16,6 +16,9 @@
   var MIN_FILL_MS = 4000;
 
   var loadedAt = Date.now();
+  /* Load any talent network page with #formdebug to see the real failure code
+     next to the friendly message. Off for every normal visitor. */
+  var DEBUG = window.location.hash.indexOf("formdebug") > -1;
 
   /* ---------------------------------------------------------
      Small helpers
@@ -280,11 +283,20 @@
       xhr.onload = function () {
         var body = null;
         try { body = JSON.parse(xhr.responseText); } catch (err) { body = null; }
-        if (xhr.status >= 200 && xhr.status < 300 && body && body.ok) resolve(body);
-        else reject(new Error((body && body.error) || "bad response"));
+        if (xhr.status >= 200 && xhr.status < 300 && body && body.ok) { resolve(body); return; }
+        /* Three distinct failures that look identical to a visitor and must not
+           look identical to whoever is debugging: the script answered and
+           refused, the script answered with something that is not our JSON
+           (a Google login page means the deployment is not open to anyone), or
+           the transport failed. */
+        if (body && body.error) {
+          reject(new Error(body.error + (body.details ? ": " + body.details.join("; ") : "")));
+        } else {
+          reject(new Error("http " + xhr.status + ", response was not our JSON"));
+        }
       };
-      xhr.onerror = function () { reject(new Error("network")); };
-      xhr.ontimeout = function () { reject(new Error("timeout")); };
+      xhr.onerror = function () { reject(new Error("request blocked before any reply, CORS or network")); };
+      xhr.ontimeout = function () { reject(new Error("timed out")); };
       xhr.send(JSON.stringify(payload));
     });
   }
@@ -390,10 +402,16 @@
           setProgress(1, "Done");
           finish();
         })
-        .catch(function () {
+        .catch(function (err) {
           busy(false);
           hideProgress();
-          showAlert(GENERIC_ERROR);
+          /* A visitor never sees a raw error. The real reason goes to the
+             console always, and onto the page when the URL carries
+             #formdebug — same convention as the dock diagnostics in
+             assets/script.js. */
+          var reason = (err && err.message) || "unknown";
+          if (window.console && console.warn) console.warn("[talent] submit failed: " + reason);
+          showAlert(DEBUG ? GENERIC_ERROR + "   [" + reason + "]" : GENERIC_ERROR);
         });
     });
 
