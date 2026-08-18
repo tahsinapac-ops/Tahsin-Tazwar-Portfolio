@@ -251,9 +251,15 @@
     return data;
   }
 
-  function readFileAsBase64(file) {
+  function readFileAsBase64(file, onProgress) {
     return new Promise(function (resolve, reject) {
       var reader = new FileReader();
+      /* This is the only genuinely measurable phase of the submission, so it is
+         the only one that gets a real percentage. See post() for why the
+         network phase cannot have one. */
+      reader.onprogress = function (e) {
+        if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total);
+      };
       reader.onload = function () {
         /* readAsDataURL gives "data:<mime>;base64,<payload>" — the backend
            wants only the payload. */
@@ -266,20 +272,26 @@
     });
   }
 
-  /* XHR rather than fetch: it is the only way to get real upload progress, and
-     a text/plain body keeps this a simple CORS request, so the browser never
-     sends a preflight that an Apps Script Web App cannot answer. */
-  function post(url, payload, onProgress) {
+  /* A text/plain body keeps this a SIMPLE CORS request, so the browser sends
+     the POST straight out with no preflight. That matters because an Apps
+     Script Web App cannot answer an OPTIONS request at all: it has no doOptions
+     hook and ContentService cannot set response headers, so a preflight comes
+     back 500 and the real POST is never sent.
+
+     DO NOT attach a listener to xhr.upload here, however tempting a byte level
+     progress bar is. Per the XHR specification, registering ANY listener on the
+     upload object sets the use-CORS-preflight flag, which drags back the exact
+     preflight this content type was chosen to avoid. That bug shipped once from
+     this line and cost an afternoon: the preflight 500s, the submission never
+     reaches Google, and the Apps Script execution log stays empty, so the
+     failure looks like a configuration problem rather than a code one.
+     The send phase therefore shows an indeterminate bar. */
+  function post(url, payload) {
     return new Promise(function (resolve, reject) {
       var xhr = new XMLHttpRequest();
       xhr.open("POST", url, true);
       xhr.setRequestHeader("Content-Type", "text/plain;charset=utf-8");
       xhr.timeout = 180000;
-      if (xhr.upload && onProgress) {
-        xhr.upload.onprogress = function (e) {
-          if (e.lengthComputable) onProgress(e.loaded / e.total);
-        };
-      }
       xhr.onload = function () {
         var body = null;
         try { body = JSON.parse(xhr.responseText); } catch (err) { body = null; }
@@ -329,15 +341,33 @@
       alertBox.hidden = false;
     }
     function hideAlert() { if (alertBox) alertBox.hidden = true; }
+    /* Measured phase: reading the file off disk. */
     function setProgress(frac, text) {
       if (!progress) return;
       progress.hidden = false;
-      if (progressBar) progressBar.style.width = Math.round(frac * 100) + "%";
+      if (progressBar) {
+        progressBar.classList.remove("indeterminate");
+        progressBar.style.width = Math.round(frac * 100) + "%";
+      }
+      if (progressLabel) progressLabel.textContent = text;
+    }
+    /* Unmeasurable phase: the request is in flight. Better an honest moving bar
+       than a percentage invented to look reassuring. */
+    function setWorking(text) {
+      if (!progress) return;
+      progress.hidden = false;
+      if (progressBar) {
+        progressBar.style.width = "";
+        progressBar.classList.add("indeterminate");
+      }
       if (progressLabel) progressLabel.textContent = text;
     }
     function hideProgress() {
       if (progress) progress.hidden = true;
-      if (progressBar) progressBar.style.width = "0%";
+      if (progressBar) {
+        progressBar.classList.remove("indeterminate");
+        progressBar.style.width = "0%";
+      }
     }
 
     form.addEventListener("submit", function (e) {
@@ -374,7 +404,12 @@
       if (file) setProgress(0.02, "Preparing " + file.name);
 
       Promise.resolve()
-        .then(function () { return file ? readFileAsBase64(file) : null; })
+        .then(function () {
+          if (!file) return null;
+          return readFileAsBase64(file, function (frac) {
+            setProgress(frac, "Reading " + file.name);
+          });
+        })
         .then(function (b64) {
           var payload = {
             type: type,
@@ -391,12 +426,8 @@
               data: b64
             };
           }
-          return post(CFG.endpoint, payload, function (frac) {
-            /* Cap the bar below 100 until the server actually answers, so it
-               never claims to be finished while the request is still open. */
-            var shown = 0.05 + frac * 0.9;
-            setProgress(shown, file ? "Uploading " + Math.round(shown * 100) + "%" : "Sending");
-          });
+          setWorking(file ? "Uploading" : "Sending");
+          return post(CFG.endpoint, payload);
         })
         .then(function () {
           setProgress(1, "Done");

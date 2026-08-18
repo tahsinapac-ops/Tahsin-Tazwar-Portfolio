@@ -171,6 +171,11 @@ fieldset.field { border:0; min-width:0; }
 
 .progress { height:4px; border-radius:999px; background:var(--surface-2); overflow:hidden; margin-top:16px; }
 .progress-bar { height:100%; width:0; border-radius:999px; background:var(--grad); transition:width .2s ease; }
+/* In flight, where no real percentage exists. See the note above post() in
+   talent.js: measuring the upload would force a CORS preflight that an Apps
+   Script Web App cannot answer. */
+.progress-bar.indeterminate { width:38%; transition:none; animation:progressSlide 1.15s ease-in-out infinite; }
+@keyframes progressSlide { from { transform:translateX(-110%); } to { transform:translateX(300%); } }
 .progress-label { display:block; font-size:12.5px; color:var(--muted); margin-top:8px; }
 
 .form-alert { margin-top:18px; padding:14px 16px; border-radius:var(--radius-btn);
@@ -223,4 +228,7 @@ fieldset.field { border:0; min-width:0; }
   .path-card:hover, .pill:hover { transform:none; }
   .path-card:hover::after { transform:none; }
   .spinner { animation:none; }
+  /* The bar still has to say "something is happening", so it fills rather
+     than disappears. */
+  .progress-bar.indeterminate { animation:none; width:100%; }
 }
