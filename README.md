@@ -14,11 +14,32 @@ A fast, self-contained static site. **No build step, no dependencies** — just 
 ├── assets/
 │   ├── styles.css        # Design system + layout (dark, premium)
 │   ├── script.js         # Nav, scroll reveals, animated stats
-│   └── tahsin.jpg        # ← add your photo here (see "Personalize")
+│   ├── globe.js          # Interactive 3D globe
+│   ├── talent.css        # Talent Network form styling
+│   ├── talent.js         # Talent Network form logic
+│   ├── talent-config.js  # ← the Apps Script Web App URL goes here
+│   └── tahsin.png        # Portrait
+├── talent-network/
+│   ├── index.html        # Global Tech Sales Talent Network + experienced form
+│   └── fresher/
+│       └── index.html    # Fresher / early career page + form
+├── backend/
+│   ├── talent-network.gs # Google Apps Script backend (not deployed by Pages)
+│   └── SETUP.md          # Seven step setup for Sheets, Drive and email
 ├── .github/workflows/
 │   └── deploy.yml         # Auto-deploys to GitHub Pages on push to main
 └── README.md
 ```
+
+## 🤝 Talent Network
+
+`/talent-network/` collects profiles from experienced global tech sales people, and
+`/talent-network/fresher/` does the same for early career applicants. The site stays
+fully static: both forms post to a Google Apps Script Web App that writes a row to a
+Google Sheet, files the resume in Google Drive, and emails a notification.
+
+Follow [`backend/SETUP.md`](backend/SETUP.md) once, then paste the deployment URL into
+`assets/talent-config.js`. Nothing secret lives in the repository.
 
 ## 🚀 View it locally
 

@@ -95,6 +95,11 @@ body::after { content:""; position:fixed; inset:0; z-index:-1; pointer-events:no
 .btn-primary:hover { box-shadow:0 20px 44px -10px var(--accent-glow); }
 .btn-ghost { color:var(--text); background:var(--surface); border-color:var(--border); }
 .btn-ghost:hover { background:var(--surface-2); border-color:var(--edge); }
+/* Third register, for a CTA that belongs to neither of the two above: an
+   outline in the brand lime rather than a fill or a neutral surface. */
+.btn-line { color:var(--accent); background:transparent; border-color:var(--edge); }
+.btn-line:hover { background:var(--surface); border-color:var(--accent); }
+.btn svg { width:17px; height:17px; flex:none; }
 
 /* Hero */
 .hero { position:relative; padding:clamp(52px,9vh,110px) 0 68px; }
